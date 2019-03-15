@@ -117,7 +117,8 @@ void GameFramework::CreateSwapChain() {
 }
 
 void GameFramework::CreateDirect3DDevice() {
-#if defined(_DEBUG) D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void **)&m_pd3dDebugController);
+#if defined(_DEBUG) 
+	D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void **)&m_pd3dDebugController);
 	m_pd3dDebugController->EnableDebugLayer();
 #endif
 

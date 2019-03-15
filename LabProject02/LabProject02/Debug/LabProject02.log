@@ -1,6 +1,2 @@
-﻿  stdafx.cpp
-  GameFramework.cpp
-c:\users\태균\source\repos\labproject02\labproject02\gameframework.cpp(120): warning C4067: 전처리기 지시문 다음에 예기치 않은 토큰이 있습니다. 줄 바꿈 문자가 필요합니다.
-  LabProject02.cpp
-  코드를 생성하고 있습니다...
-  LabProject02.vcxproj -> C:\Users\태균\source\repos\LabProject02\Debug\LabProject02.exe
+﻿  LabProject02.cpp
+  LabProject02.vcxproj -> C:\Users\태균\Desktop\2019-1\3D_Game Programming\3D-Game-Programming\LabProject02\Debug\LabProject02.exe
