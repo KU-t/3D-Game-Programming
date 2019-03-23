@@ -18,6 +18,7 @@ public:
 	CCamera();
 	virtual ~CCamera();
 
+	// (x, y, z) ÁÂÇ¥
 	XMFLOAT3					m_xmf3Position;
 	XMFLOAT3					m_xmf3Right;
 	XMFLOAT3					m_xmf3Up;

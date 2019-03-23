@@ -31,6 +31,7 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	m_hInstance = hInstance;
 	m_hWnd = hMainWnd;
 
+	//viewport俊 历厘
 	RECT rc;
 	GetClientRect(m_hWnd, &rc);
 	m_xViewport = rc.left;
@@ -38,14 +39,17 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	m_cxViewport = rc.right - rc.left;
 	m_cyViewport = rc.bottom - rc.top;
 
+	//camera 积己
 	m_pCamera = new CCamera();
 
 	BuildFrameBuffer(); 
 
 //    srand(timeGetTime());
 
+	//object积己
 	BuildObjects(); 
 
+	//gamestate 汲沥
 	SetupGameState();
 
 	return(true);
@@ -55,7 +59,7 @@ void CGameFramework::BuildFrameBuffer()
 {
     HDC hDC = ::GetDC(m_hWnd);
 
-    if (!m_hDCFrameBuffer) m_hDCFrameBuffer = ::CreateCompatibleDC(hDC);
+	if (!m_hDCFrameBuffer) m_hDCFrameBuffer = ::CreateCompatibleDC(hDC);
     if (m_hBitmapFrameBuffer) 
     {
         ::SelectObject(m_hDCFrameBuffer, NULL);

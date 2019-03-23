@@ -8,8 +8,8 @@
 class CGameObject
 {
 public:
-	CGameObject(CMesh *pMesh);
 	CGameObject();
+	CGameObject(CMesh *pMesh);
 	virtual ~CGameObject();
 
 public:

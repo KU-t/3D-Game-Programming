@@ -17,7 +17,7 @@ class CVertex
 {
 public:
 	CVertex() { }
-    CVertex(float x, float y, float z, DWORD dwColor=0x00000000) { m_vPosition = CPoint(x, y, z); m_dwColor = dwColor; }
+    CVertex(float x, float y, float z, DWORD dwColor=0x00000000) { m_vPosition = CPoint(x, y, z); m_dwColor = dwColor; }	// vertex : x, y, z, color
 
     CPoint					m_vPosition;  
 	DWORD					m_dwColor;   
@@ -48,7 +48,7 @@ public:
     int						m_nPolygons;     
     CPolygon				**m_ppPolygons;   
 
-	void SetPolygon(int nIndex, CPolygon *pPolygon);
+	void SetPolygon(int nIndex, CPolygon *pPolygon);	// polygon pointer들의 배열
 };
 
 class CGameObject

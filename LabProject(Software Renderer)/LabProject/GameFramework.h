@@ -27,10 +27,12 @@ public:
 	void ResetDisplay(int nClientWidth=0, int nClientHeight=0);
 
 private:
+	//window handle
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd; 
 	HMENU						m_hMenu;
 
+	//Device contact
     HDC							m_hDCFrameBuffer;   
     HBITMAP						m_hBitmapFrameBuffer;   
     HBITMAP						m_hBitmapSelect;     

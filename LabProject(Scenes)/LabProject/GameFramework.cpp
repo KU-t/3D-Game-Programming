@@ -5,18 +5,22 @@
 #include "stdafx.h"
 #include "GameFramework.h"
 
-CGameFramework::CGameFramework()
-{
+CGameFramework::CGameFramework(){
+	m_pd3dDevice = NULL;
+	m_pDXGISwapChain = NULL;
+	//m_pd3dDeviceContext = NULL;
+	//m_pd3dRenderTargetView = NULL;
+
 	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
 }
 
-CGameFramework::~CGameFramework()
-{
+CGameFramework::~CGameFramework(){
 }
 
-bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
-{
-    ::srand(timeGetTime());
+// 프로그래밍 싱행되면 호출되는 함수
+// 프레임 워크 객체 초기화
+bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd) {
+	::srand(timeGetTime());
 
 	m_hInstance = hInstance;
 	m_hWnd = hMainWnd;
@@ -24,12 +28,11 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	BuildFrameBuffer(); 
 
 	BuildObjects(); 
-
+	
 	return(true);
 }
 
-void CGameFramework::BuildFrameBuffer()
-{
+void CGameFramework::BuildFrameBuffer() {
     HDC hDC = ::GetDC(m_hWnd);
 
 	RECT rcClient;
@@ -43,8 +46,7 @@ void CGameFramework::BuildFrameBuffer()
     ::SetBkMode(m_hDCFrameBuffer, TRANSPARENT);
 }
 
-void CGameFramework::ClearFrameBuffer(DWORD dwColor)
-{
+void CGameFramework::ClearFrameBuffer(DWORD dwColor){
     HBRUSH hBrush = ::CreateSolidBrush(dwColor);
     HBRUSH hOldBrush = (HBRUSH)::SelectObject(m_hDCFrameBuffer, hBrush);
 	::Rectangle(m_hDCFrameBuffer, m_pPlayer->m_pCamera->m_Viewport.m_xStart, m_pPlayer->m_pCamera->m_Viewport.m_yStart, m_pPlayer->m_pCamera->m_Viewport.m_nWidth, m_pPlayer->m_pCamera->m_Viewport.m_nHeight);
@@ -52,70 +54,71 @@ void CGameFramework::ClearFrameBuffer(DWORD dwColor)
     ::DeleteObject(hBrush);
 }
 
-void CGameFramework::PresentFrameBuffer()
-{    
+void CGameFramework::PresentFrameBuffer(){    
     HDC hDC = ::GetDC(m_hWnd);
     ::BitBlt(hDC, m_pPlayer->m_pCamera->m_Viewport.m_xStart, m_pPlayer->m_pCamera->m_Viewport.m_yStart, m_pPlayer->m_pCamera->m_Viewport.m_nWidth, m_pPlayer->m_pCamera->m_Viewport.m_nHeight, m_hDCFrameBuffer, m_pPlayer->m_pCamera->m_Viewport.m_xStart, m_pPlayer->m_pCamera->m_Viewport.m_yStart, SRCCOPY);
     ::ReleaseDC(m_hWnd, hDC);
 }
 
-void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
-{
-	switch (nMessageID)
-	{
+void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) {
+	switch (nMessageID) {
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
 			::SetCapture(hWnd);
 			::GetCursorPos(&m_ptOldCursorPos);
 			break;
+
 		case WM_LBUTTONUP:
 		case WM_RBUTTONUP:
 			::ReleaseCapture();
 			break;
+
 		case WM_MOUSEMOVE:
 			break;
+
 		default:
 			break;
 	}
 }
 
-void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
-{
-	switch (nMessageID)
-	{
+void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) {
+	switch (nMessageID) {
 		case WM_KEYDOWN:
-			switch (wParam)
-			{
+			switch (wParam) {
 				case VK_ESCAPE:
 					::PostQuitMessage(0);
 					break;
-				case 'S':
-				{
-					if (m_pScene)
-					{
+
+				case 'S': {
+
+					if (m_pScene) {
 						m_pScene->ReleaseObjects();
 						delete m_pScene;
 					}
+
 					m_nScene = (m_nScene + 1) % m_nScenes;
-					switch (m_nScene)
-					{
+
+					switch (m_nScene) {
 						case 0: 
 							m_pScene = new CPlayerScene(); 
 							break;
+
 						case 1: 
 							m_pScene = new CCollisionScene(); 
 							break;
+
 						case 2: 
 							m_pScene = new CExplosionScene(); 
 							break;
+
 						case 3: 
 							m_pScene = new CRunAwayScene(); 	
 							break;
 					}
 
 					if (m_pPlayer) delete m_pPlayer;
-					if (m_nScene == 3)
-					{
+
+					if (m_nScene == 3) {
 						CCubeMesh *pCubeMesh = new CCubeMesh(4.0f, 4.0f, 4.0f);
 						m_pPlayer = new CTerrainPlayer();
 						m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
@@ -124,8 +127,8 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 						m_pPlayer->SetMesh(pCubeMesh);
 						m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 50.0f, -35.0f));
 					}
-					else
-					{
+
+					else {
 						CAirplaneMesh *pAirplaneMesh = new CAirplaneMesh(6.0f, 6.0f, 1.0f);
 						m_pPlayer = new CAirplanePlayer();
 						m_pPlayer->SetPosition(0.0f, 0.0f, -30.0f);
@@ -145,25 +148,25 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 					break;
 			}
 			break;
+
 		default:
 			break;
 	}
 }
 
-LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
-{
-	switch (nMessageID)
-	{
-		case WM_ACTIVATE:
-		{
-			if (LOWORD(wParam) == WA_INACTIVE)
-				m_GameTimer.Stop();
-			else
-				m_GameTimer.Start();
+LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) {
+	
+	switch (nMessageID) {
+		
+	case WM_ACTIVATE: 	{
+			if (LOWORD(wParam) == WA_INACTIVE)	m_GameTimer.Stop();
+			else	m_GameTimer.Start();
 			break;
 		}
+
 		case WM_SIZE:
 			break;
+
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
 		case WM_LBUTTONUP:
@@ -171,6 +174,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 		case WM_MOUSEMOVE:
 			OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
 			break;
+
 		case WM_KEYDOWN:
 		case WM_KEYUP:
 			OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
@@ -179,8 +183,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 		return(0);
 }
 
-void CGameFramework::BuildObjects()
-{
+void CGameFramework::BuildObjects() {
 	CAirplaneMesh *pAirplaneMesh = new CAirplaneMesh(6.0f, 6.0f, 1.0f);
 	m_pPlayer = new CAirplanePlayer();
 	m_pPlayer->SetPosition(0.0f, 0.0f, -30.0f);
@@ -197,10 +200,8 @@ void CGameFramework::BuildObjects()
 	m_pScene->m_pPlayer = m_pPlayer;
 }
 
-void CGameFramework::ReleaseObjects()
-{
-	if (m_pScene)
-	{
+void CGameFramework::ReleaseObjects() {
+	if (m_pScene) 	{
 		m_pScene->ReleaseObjects();
 		delete m_pScene;
 	}
@@ -208,8 +209,7 @@ void CGameFramework::ReleaseObjects()
 	if (m_pPlayer) delete m_pPlayer;
 }
 
-void CGameFramework::OnDestroy()
-{
+void CGameFramework::OnDestroy() {
 	ReleaseObjects();
 
 	if (m_hBitmapFrameBuffer) ::DeleteObject(m_hBitmapFrameBuffer);
@@ -218,12 +218,11 @@ void CGameFramework::OnDestroy()
     if (m_hWnd) DestroyWindow(m_hWnd);
 }
 
-void CGameFramework::ProcessInput()
-{
+void CGameFramework::ProcessInput() {
 	static UCHAR pKeyBuffer[256];
 	DWORD dwDirection = 0;
-	if (GetKeyboardState(pKeyBuffer))
-	{
+
+	if (GetKeyboardState(pKeyBuffer)) {
 		if (pKeyBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
 		if (pKeyBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
 		if (pKeyBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
@@ -231,32 +230,33 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 	}
+
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
-	if (GetCapture() == m_hWnd)
-	{
+	if (GetCapture() == m_hWnd) 	{
 		SetCursor(NULL);
 		GetCursorPos(&ptCursorPos);
 		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
 		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 	}
-	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
-	{
-		if (cxDelta || cyDelta)
-		{
+
+	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f)) 	{
+
+		if (cxDelta || cyDelta)	{
 			if (pKeyBuffer[VK_RBUTTON] & 0xF0)
 				m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
 			else
 				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 		}
+
 		if (dwDirection) m_pPlayer->Move(dwDirection, 0.15f);
+
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 }
 
-void CGameFramework::FrameAdvance()
-{    
+void CGameFramework::FrameAdvance() {    
     if (!m_bActive) return;
 
 	m_GameTimer.Tick(0.0f);

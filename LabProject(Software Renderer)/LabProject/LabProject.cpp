@@ -46,6 +46,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LABPROJECT));
 
 	// 기본 메시지 루프입니다.
+	// window에서 game으로 넘어올때 message가 없을때도 cpu사용을 위해 while(true)로 무한루프
+	// getmessage() -> peekmessage()
 	while (1) 
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) 
