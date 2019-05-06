@@ -1,0 +1,6 @@
+﻿  stdafx.cpp
+  GameFramework.cpp
+  GameTimer.cpp
+  Labproject04.cpp
+GameTimer.obj : error LNK2001: __imp__timeGetTime@0 외부 기호를 확인할 수 없습니다.
+C:\Users\태균\Desktop\2019-1\3D_Game Programming\3D-Game-Programming\Labproject04\Release\Labproject04.exe : fatal error LNK1120: 1개의 확인할 수 없는 외부 참조입니다.

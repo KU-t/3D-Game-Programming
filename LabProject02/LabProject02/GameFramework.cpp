@@ -302,7 +302,7 @@ void GameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPAR
 		case WM_KEYUP:
 			switch (wParam) {
 				case VK_ESCAPE:
-					::PostQuitMessage(0);
+					PostQuitMessage(0);
 					break;
 				
 				case VK_RETURN:
@@ -342,7 +342,7 @@ LRESULT CALLBACK GameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMessa
 		
 		case WM_KEYDOWN:
 		case WM_KEYUP:
-			OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
+  			OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
 			break;
 	} 
 	return(0);
