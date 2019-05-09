@@ -119,9 +119,13 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
+		case WM_MOUSEMOVE:
+			OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
+			break;
+
+
 		case WM_LBUTTONUP:
 		case WM_RBUTTONUP:
-		case WM_MOUSEMOVE:
 			OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
 			break;
 
@@ -140,20 +144,12 @@ void CGameFramework::BuildObjects() {
 	m_pPlayer->SetPosition(0.0f, 0.0f, -30.0f);
 	m_pPlayer->SetMesh(pAirplaneMesh);
 	m_pPlayer->SetColor(RGB(0, 0, 255));
-	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 5.0f, -15.0f));
-
-	/*CAirplaneMesh *pTrainMesh = new CAirplaneMesh(2.0f, 2.0f, 0.7f);
-	m_pTrain = new CAirplanePlayer();
-	m_pTrain->SetPosition(0.0f, 0.0f, -30.0f);
-	m_pTrain->SetMesh(pTrainMesh);
-	m_pTrain->SetColor(RGB(255, 0, 0));
-	m_pTrain->SetCameraOffset(XMFLOAT3(0.0f, 5.0f, -15.0f));*/
+	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 5.0f, -10.0f));
 
 	m_pScene = new CPlayerScene();
 	m_pScene->BuildObjects();
 
 	m_pScene->m_pPlayer = m_pPlayer;
-	//m_pScene->m_pTrain = m_pTrain;
 }
 
 // 객체 삭제
@@ -164,15 +160,16 @@ void CGameFramework::ReleaseObjects() {
 	}
 
 	if (m_pPlayer) delete m_pPlayer;
-	//if (m_pTrain) delete m_pTrain;
 }
 
 // 종료될때
 void CGameFramework::OnDestroy() {
 	ReleaseObjects();
 
-	if (m_hBitmapFrameBuffer) ::DeleteObject(m_hBitmapFrameBuffer);
-    if (m_hDCFrameBuffer) ::DeleteDC(m_hDCFrameBuffer);
+	if (m_hBitmapFrameBuffer) 
+		::DeleteObject(m_hBitmapFrameBuffer);
+    if (m_hDCFrameBuffer) 
+		::DeleteDC(m_hDCFrameBuffer);
 
     if (m_hWnd) DestroyWindow(m_hWnd);
 }
@@ -181,14 +178,15 @@ void CGameFramework::OnDestroy() {
 void CGameFramework::ProcessInput() {
 	static UCHAR pKeyBuffer[256];
 	DWORD dwDirection = 0;
+	MoveTrain = false;
 
 	if (GetKeyboardState(pKeyBuffer)) {
 		if (pKeyBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
-		if (pKeyBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
-		if (pKeyBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
-		if (pKeyBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
-		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
-		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
+		//if (pKeyBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
+		//if (pKeyBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
+		//if (pKeyBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
+		//if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
+		//if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 	}
 
 	float cxDelta = 0.0f, cyDelta = 0.0f;
@@ -197,27 +195,41 @@ void CGameFramework::ProcessInput() {
 		SetCursor(NULL);
 		GetCursorPos(&ptCursorPos);
 		// 나눈값  == 가중치
-		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 20.0f;
-		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 20.0f;
+		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 40.0f;
+		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 40.0f;
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 	}
 
-	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f)) 	{
-
-		if (cxDelta || cyDelta)	{
-			if (pKeyBuffer[VK_RBUTTON] & 0xF0)
+	float distance = 0.f;
+	
+	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f)) {
+		if (cxDelta || cyDelta) {
+			if (pKeyBuffer[VK_RBUTTON] & 0xF0) {
 				m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-			else
+				distance += 0.03;
+			}
+			else if (pKeyBuffer[VK_LBUTTON] & 0xF0) {
 				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+				distance += 0.03;
+			}
 		}
-		// 두번째인자 == 가중치
-		if (dwDirection) 
-			m_pPlayer->Move(dwDirection, 0.015f);
+		// 키보드 입력으로 이동할때
+		if (dwDirection)		distance = 0.05f;
 
+		// player look vecter 
+		XMFLOAT3 playerlook = m_pPlayer->GetLook();
+		
+		//위로 이동
+		if (playerlook.y > 0)	distance -= 0.015;
+
+		//아래로 이동
+		else if (playerlook.y < 0)	distance += 0.015;
+
+
+		MoveTrain = true;
 	}
-	//매초마다 앞으로
-	dwDirection |= DIR_FORWARD;
-	m_pPlayer->Move(1, 0.03f);
+
+	m_pPlayer->Move(1,distance);
 
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 }
@@ -230,16 +242,15 @@ void CGameFramework::FrameAdvance() {
 
 	ProcessInput();
 
-	//m_pScene->Animate(m_GameTimer.GetTimeElapsed());
-	
 	if (!m_GameTimer.GetTimeCreateRail())
 		m_pScene->CreateRail(m_pPlayer);
-
+	
+	m_pScene->UpdateFrontRail(m_pPlayer);
+	
 	ClearFrameBuffer(RGB(255, 255, 255));
 
+	m_pScene->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera, MoveTrain);
 	m_pPlayer->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
-	//m_pTrain->Render(m_hDCFrameBuffer, m_pTrain->m_pCamera);
-	m_pScene->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
 
 	PresentFrameBuffer();
 

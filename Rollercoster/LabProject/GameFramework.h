@@ -28,6 +28,7 @@ private:
 	HWND						m_hWnd = NULL;
 
     bool							m_bActive = true;          
+	bool							MoveTrain = false;
 
 	CGameTimer			m_GameTimer;
 
@@ -35,7 +36,6 @@ private:
     HBITMAP					m_hBitmapFrameBuffer = NULL;
 
 	CPlayer						*m_pPlayer = NULL;
-	//CPlayer						*m_pTrain = NULL;
 
 	CAirplaneMesh			*m_pAirplaneMesh = NULL;
 	CCubeMesh				*m_pCubeMesh = NULL;
@@ -47,12 +47,6 @@ private:
 
 	// SwapChain 인터페이스
 	IDXGISwapChain *m_pDXGISwapChain;
-
-	//Device Context 인터페이스
-	//ID3D11DeviceContext *m_pd3dDeviceContext;
-
-	// Render Target View 인터페이스
-	//ID#D11RenderTargetView *m_pd3dRenderTargetView;
 
 public:
 	void BuildFrameBuffer();

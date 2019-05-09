@@ -1,7 +1,6 @@
 #pragma once
 
-struct VIEWPORT
-{
+struct VIEWPORT{
 	int							m_xStart;
 	int							m_yStart;
 	int							m_nWidth;
@@ -10,15 +9,11 @@ struct VIEWPORT
 
 class CPlayer;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-class CCamera
-{
+class CCamera{
 public:
 	CCamera();
 	virtual ~CCamera();
 
-	// (x, y, z) ÁÂÇ¥
 	XMFLOAT3					m_xmf3Position;
 	XMFLOAT3					m_xmf3Right;
 	XMFLOAT3					m_xmf3Up;

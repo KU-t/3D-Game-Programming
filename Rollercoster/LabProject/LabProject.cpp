@@ -125,7 +125,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow){
 	hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
 	// Rect 크기 -> 윈도우 크기
-	RECT rc = { 0, 0, CLIENT_WIDTH*2, CLIENT_HEIGHT };
+	RECT rc = { 0, 0, CLIENT_WIDTH, CLIENT_HEIGHT };
 	
 	// 윈도우 설정
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);

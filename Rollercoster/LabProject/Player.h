@@ -2,16 +2,13 @@
 
 #include "GameObject.h"
 
-class CPlayer : public CGameObject
-{
+class CPlayer : public CGameObject{
 public:
 	CPlayer();
-	CPlayer(int count);
 	virtual ~CPlayer();
 
 	XMFLOAT3					m_xmf3Position;
 	
-
 	XMFLOAT3					m_xmf3CameraOffset;
 	XMFLOAT3					m_xmf3Velocity;
 	float						m_fFriction = 125.0f;
@@ -35,16 +32,12 @@ public:
 
 	virtual void OnPreRender();
 	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
-
-	
 };
 
-class CAirplanePlayer : public CPlayer
-{
+class CAirplanePlayer : public CPlayer{
 public:
 	CAirplanePlayer() { }
 	virtual ~CAirplanePlayer() { }
 
 	virtual void OnPreRender();
 };
-

@@ -5,8 +5,7 @@
 
 const ULONG MAX_SAMPLE_COUNT = 50; // Maximum frame time sample count
 
-class CGameTimer
-{
+class CGameTimer{
 public:
 	CGameTimer();
 	virtual ~CGameTimer();
@@ -24,7 +23,7 @@ public:
 private:
 	double							m_fTimeScale;						
 	float							m_fTimeElapsed;	
-	int					MaxCreateRailTime = 100;
+	int					MaxCreateRailTime = 30;
 	int					CreateRailTime;
 	__int64							m_nBasePerformanceCounter;
 	__int64							m_nPausedPerformanceCounter;
