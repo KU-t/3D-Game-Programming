@@ -33,16 +33,9 @@ void CPlayer::SetCameraOffset(XMFLOAT3& xmf3CameraOffset){
 }
 
 void CPlayer::Move(DWORD dwDirection, float fDistance){
-	if (dwDirection)
-	{
+	if (dwDirection)	{
 		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
 		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
-		if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
-		if (dwDirection & DIR_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
-		if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
-		if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
-		if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
-
 		Move(xmf3Shift, true);
 	}
 }
@@ -63,6 +56,7 @@ void CPlayer::Move(float x, float y, float z){
 
 void CPlayer::Rotate(float fPitch, float fYaw, float fRoll){
 	m_pCamera->Rotate(fPitch, fYaw, fRoll);
+
 	if (fPitch != 0.0f)
 	{
 		XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(fPitch));
@@ -87,8 +81,14 @@ void CPlayer::Rotate(float fPitch, float fYaw, float fRoll){
 	m_xmf3Up = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Look, m_xmf3Right));
 }
 
+void CPlayer::SetRotate(float fPitch, float fYaw, float fRoll){
+	m_fPitch = fPitch;
+	m_fYaw = fYaw;
+	m_fRoll = fRoll;
+}
+
 XMFLOAT3 CPlayer::GetRotate() {
-	return XMFLOAT3(m_fPitch, m_fYaw, m_fRoll);
+	return XMFLOAT3(m_fPitch , m_fYaw , m_fRoll );
 }
 
 void CPlayer::Update(float fTimeElapsed){

@@ -38,8 +38,7 @@ private:
 	CPlayer						*m_pPlayer = NULL;
 
 	CAirplaneMesh			*m_pAirplaneMesh = NULL;
-	CCubeMesh				*m_pCubeMesh = NULL;
-
+	
 	CScene						*m_pScene = NULL;
 
 	// Direct3D 디바이스 인터페이스

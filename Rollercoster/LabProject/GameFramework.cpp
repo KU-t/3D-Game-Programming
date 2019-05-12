@@ -182,11 +182,6 @@ void CGameFramework::ProcessInput() {
 
 	if (GetKeyboardState(pKeyBuffer)) {
 		if (pKeyBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
-		//if (pKeyBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
-		//if (pKeyBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
-		//if (pKeyBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
-		//if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
-		//if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 	}
 
 	float cxDelta = 0.0f, cyDelta = 0.0f;
@@ -203,14 +198,16 @@ void CGameFramework::ProcessInput() {
 	float distance = 0.f;
 	
 	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f)) {
+		m_pPlayer->SetRotate(0.f, 0.f, 0.f);
 		if (cxDelta || cyDelta) {
 			if (pKeyBuffer[VK_RBUTTON] & 0xF0) {
 				m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-				distance += 0.03;
+				distance += 0.03f;
 			}
 			else if (pKeyBuffer[VK_LBUTTON] & 0xF0) {
 				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
-				distance += 0.03;
+				m_pPlayer->SetRotate(cyDelta, cxDelta, 0.0f);
+				distance += 0.03f;
 			}
 		}
 		// 키보드 입력으로 이동할때
@@ -220,10 +217,10 @@ void CGameFramework::ProcessInput() {
 		XMFLOAT3 playerlook = m_pPlayer->GetLook();
 		
 		//위로 이동
-		if (playerlook.y > 0)	distance -= 0.015;
+		if (playerlook.y > 0)	distance -= 0.015f;
 
 		//아래로 이동
-		else if (playerlook.y < 0)	distance += 0.015;
+		else if (playerlook.y < 0)	distance += 0.015f;
 
 
 		MoveTrain = true;
@@ -242,10 +239,11 @@ void CGameFramework::FrameAdvance() {
 
 	ProcessInput();
 
-	if (!m_GameTimer.GetTimeCreateRail())
+	if (MoveTrain) {
 		m_pScene->CreateRail(m_pPlayer);
-	
-	m_pScene->UpdateFrontRail(m_pPlayer);
+		m_pScene->UpdateBackRail();
+		m_pScene->UpdateFrontRail(m_pPlayer);
+	}
 	
 	ClearFrameBuffer(RGB(255, 255, 255));
 

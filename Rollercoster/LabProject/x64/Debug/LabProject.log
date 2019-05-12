@@ -1,9 +1,2 @@
-﻿  GameFramework.cpp
-c:\users\태균\desktop\2019-1\3d_game programming\3d-game-programming\rollercoster\labproject\gameframework.cpp(209): warning C4305: '+=': 'double'에서 'float'(으)로 잘립니다.
-c:\users\태균\desktop\2019-1\3d_game programming\3d-game-programming\rollercoster\labproject\gameframework.cpp(213): warning C4305: '+=': 'double'에서 'float'(으)로 잘립니다.
-c:\users\태균\desktop\2019-1\3d_game programming\3d-game-programming\rollercoster\labproject\gameframework.cpp(223): warning C4305: '-=': 'double'에서 'float'(으)로 잘립니다.
-c:\users\태균\desktop\2019-1\3d_game programming\3d-game-programming\rollercoster\labproject\gameframework.cpp(226): warning C4305: '+=': 'double'에서 'float'(으)로 잘립니다.
-  LabProject.cpp
-  Scene.cpp
-  코드를 생성하고 있습니다...
+﻿  Scene.cpp
   LabProject.vcxproj -> C:\Users\태균\Desktop\2019-1\3D_Game Programming\3D-Game-Programming\Rollercoster\x64\Debug\LabProject.exe

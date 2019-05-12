@@ -3,8 +3,7 @@
 #include "GameObject.h"
 #include "Player.h"
 
-class CScene
-{
+class CScene{
 public:
 	CScene();
 	virtual ~CScene();
@@ -12,14 +11,17 @@ public:
 	CPlayer						*m_pPlayer = NULL;
 	CPlayer						*m_pTrain = NULL;
 
-	int m_rails= 0;
-	int m_pointrail = 0;
+	int m_maxrails;
+	int m_pointrail;
 	CGameObject **m_pprail = NULL;
 
-	int m_frontrails = 0;
+	int m_maxfrontrails;
 	CGameObject **m_ppfrontrail = NULL;
 
 	CGameObject	*m_pTerrainObject = NULL;
+
+	int					MaxCreateRailTime;
+	int					CreateRailTime;
 
 	virtual void BuildObjects();
 	virtual void ReleaseObjects();

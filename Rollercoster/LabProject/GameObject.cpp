@@ -79,8 +79,7 @@ XMFLOAT3 CGameObject::GetRight(){
 }
 
 void CGameObject::Rotate(float fPitch, float fYaw, float fRoll){
-	XMFLOAT4X4 mtxRotate = Matrix4x4::RotationYawPitchRoll(fPitch, fYaw, fRoll);
-	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
+	CGameObject::Rotate(XMFLOAT3(fPitch, fYaw, fRoll));
 }
 
 void CGameObject::Rotate(XMFLOAT3& rotate){

@@ -11,7 +11,7 @@ CGameTimer::CGameTimer(){
 	::QueryPerformanceCounter((LARGE_INTEGER *)&m_nLastPerformanceCounter); 
 	m_fTimeScale = 1.0 / (double)m_PerformanceFrequencyPerSec;
 
-	CreateRailTime = 0;
+	
 
 	m_nBasePerformanceCounter = m_nLastPerformanceCounter;
 	m_nPausedPerformanceCounter = 0;
@@ -27,8 +27,7 @@ CGameTimer::~CGameTimer(){
 }
 
 void CGameTimer::Tick(float fLockFPS){
-	CreateRailTime = (CreateRailTime + 1) % MaxCreateRailTime;
-
+	
 	if (m_bStopped)	{
 		m_fTimeElapsed = 0.0f;
 		return;
@@ -87,10 +86,6 @@ float CGameTimer::GetTotalTime(){
 		return(float(((m_nStopPerformanceCounter - m_nPausedPerformanceCounter) - m_nBasePerformanceCounter) * m_fTimeScale));
 	
 	return(float(((m_nCurrentPerformanceCounter - m_nPausedPerformanceCounter) - m_nBasePerformanceCounter) * m_fTimeScale));
-}
-
-int CGameTimer::GetTimeCreateRail(){
-	return CreateRailTime;
 }
 
 void CGameTimer::Reset(){

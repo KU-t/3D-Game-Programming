@@ -18,13 +18,11 @@ public:
     unsigned long GetFrameRate(LPTSTR lpszString = NULL, int nCharacters=0);
     float GetTimeElapsed();
 	float GetTotalTime();
-	int GetTimeCreateRail();
-
+	
 private:
 	double							m_fTimeScale;						
 	float							m_fTimeElapsed;	
-	int					MaxCreateRailTime = 30;
-	int					CreateRailTime;
+
 	__int64							m_nBasePerformanceCounter;
 	__int64							m_nPausedPerformanceCounter;
 	__int64							m_nStopPerformanceCounter;

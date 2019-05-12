@@ -24,7 +24,9 @@ public:
 	void Move(DWORD dwDirection, float fDistance);
 	void Move(XMFLOAT3& xmf3Shift, bool bUpdateVelocity);
 	void Move(float x, float y, float z);
+
 	void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
+	void SetRotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
 	XMFLOAT3 GetRotate();
 
 	void SetCameraOffset(XMFLOAT3& xmf3CameraOffset);
