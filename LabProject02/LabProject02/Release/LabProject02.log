@@ -1,7 +1,7 @@
-﻿  stdafx.cpp
-  GameFramework.cpp
-  LabProject02.cpp
+﻿  GameFramework.cpp
   코드를 생성하고 있습니다.
-  All 27 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  1 of 27 functions ( 3.7%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
   LabProject02.vcxproj -> C:\Users\태균\Desktop\2019-1\3D_Game Programming\3D-Game-Programming\LabProject02\Release\LabProject02.exe

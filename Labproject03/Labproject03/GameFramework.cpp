@@ -403,7 +403,7 @@ void GameFramework::FrameAdvance() {
 	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * m_nRtvDescriptorIncrementSize);
 	//현재의 렌더 타겟에 해당하는 서술자의 CPU 주소(핸들)를 계산한다.
 
-	float pfClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
+	float pfClearColor[4] = { 1.0f, 0.f, 0.f, 1.0f };
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor
 		/*Colors::Azure*/, 0, NULL);
 	//원하는 색상으로 렌더 타겟(뷰)을 지운다.
@@ -447,7 +447,7 @@ void GameFramework::FrameAdvance() {
 	dxgiPresentParameters.pDirtyRects = NULL;
 	dxgiPresentParameters.pScrollRect = NULL;
 	dxgiPresentParameters.pScrollOffset = NULL;
-	m_pdxgiSwapChain->Present1(1, 0, &dxgiPresentParameters);
+	
 	/*스왑체인을 프리젠트한다.
 	프리젠트를 하면 현재 렌더 타겟(후면버퍼)의 내용이 전면버퍼로 옮겨지고 렌더 타겟 인 덱스가 바뀔 것이다.*/
 

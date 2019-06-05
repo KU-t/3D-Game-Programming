@@ -398,7 +398,7 @@ void GameFramework::FrameAdvance() {
 	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * m_nRtvDescriptorIncrementSize);
 	//현재의 렌더 타겟에 해당하는 서술자의 CPU 주소(핸들)를 계산한다.
 
-	float pfClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
+	float pfClearColor[4] = { 0.0f, 1.f, 0.0f, 1.0f };
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor
 		/*Colors::Azure*/, 0, NULL);
 	//원하는 색상으로 렌더 타겟(뷰)을 지운다.
