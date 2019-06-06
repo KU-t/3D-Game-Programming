@@ -1,19 +1,13 @@
 #pragma once
-#include "GameTimer.h"
+#include "Timer.h"
 
-class Scene {
+class Scene{
 public:
-	//루트 시그너쳐를 나타내는 인터페이스 포인터이다. 
-	ID3D12RootSignature *m_pd3dGraphicsRootSignature;
-	//파이프라인 상태를 나타내는 인터페이스 포인터이다.
-	ID3D12PipelineState *m_pd3dPipelineState;
-	
 	Scene();
 	~Scene();
-
 	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	bool OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
-	
+
 	void BuildObjects(ID3D12Device *pd3dDevice);
 	void ReleaseObjects();
 
@@ -21,4 +15,10 @@ public:
 	void AnimateObjects(float fTimeElapsed);
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList);
 
+	//루트 시그너쳐를 나타내는 인터페이스 포인터이다.
+	ID3D12RootSignature *m_pd3dGraphicsRootSignature;
+	//파이프라인 상태를 나타내는 인터페이스 포인터이다.
+	ID3D12PipelineState *m_pd3dPipelineState; 
 };
+
+

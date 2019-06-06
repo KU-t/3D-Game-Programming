@@ -1,132 +1,97 @@
 #pragma once
-#include "GameTimer.h"
+#include "Timer.h"
 #include "Scene.h"
 
-class GameFramework {
-	HINSTANCE m_hInstance;
-	HWND m_hWnd;
-	
-	//scene 
+class GameFramework{
+private:
+
+	GameTimer m_GameTimer;//게임 프레임워크에서 사용할 타이머
+	_TCHAR m_pszFrameRate[50]; //프레임 레이트를 주 윈도우의 캡션에 출력하기 위한 문자열
+
+	// Scene
 	Scene *m_pScene;
 
+	HINSTANCE m_hInstance;
+	HWND m_hWnd;
 	int m_nWndClientWidth;
 	int m_nWndClientHeight;
 
-	// DXGI 팩토리 인터페이스에 대한 포인터
-	IDXGIFactory4 *m_pdxgiFactory;	
-	// 스왑 체인 인터페이스에 대한 포인터 ( 디스플레이 제어)
-	IDXGISwapChain3 *m_pdxgiSwapChain;	
-	// Direct3D 디바이스 인터페이스에 대한 포인터 (리소스 생성)
-	ID3D12Device *m_pd3dDevice;		
+	IDXGIFactory4* m_pdxgiFactory;
+	IDXGISwapChain3* m_pdxgiSwapChain; // 디스플레이 제어를 위해
+	ID3D12Device* m_pd3dDevice; // 리소스 생성을 위해
 
-	//다중샘플링 4배 여부
 	bool m_bMsaa4xEnable = false;
-	//다중샘플링 MSDI지원 여부
-	UINT m_nMsaa4xQualityLevels = 0;
+	UINT m_nMsaa4xQualityLevels = 0; // 다중 샘플링을 활성화, 다중 샘플링 레벨을 설정
 
-	// 스왑 체인의 후면 버퍼의 개수
-	static const UINT m_nSwapChainBuffers = 2;	
-	// 현재 스왑 체인의 후면 버퍼 인덱스
-	UINT m_nSwapChainBufferIndex;		
+	static const UINT m_nSwapChainBuffers = 2; //스왑체인 백버퍼 수
+	UINT m_nSwapChainBufferIndex; //스왑체인 백버퍼 현재 인덱스
 
-	// 렌더 타겟버퍼 포인터
-	ID3D12Resource *m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];	
-	// 서술자 힙 인터페이스 포인터 
-	ID3D12DescriptorHeap *m_pd3dRtvDescriptorHeap;	
-	// 렌더 타겟 서술자 원소 크기
-	UINT m_nRtvDescriptorIncrementSize;	
+	//렌더 타켓, 서술자 힙, 렌더 타켓 서술자 원소의 크기
+	ID3D12Resource *m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
+	ID3D12DescriptorHeap *m_pd3dRtvDescriptorHeap;
+	UINT m_nRtvDescriptorIncrementSize;
 
-	// 깊이-스텐실 버퍼 포인터
-	ID3D12Resource *m_pd3dDepthStencilBuffer;	
-	// 서술자 힙 인터페이스 포인터
-	ID3D12DescriptorHeap *m_pd3dDsvDescriptorHeap;	
-	// 깊이-스텐실 서술자 원소의 크기
-	UINT m_nDsvDescriptorIncrementSize;	
+	//디프스텐실 버퍼, 서술자 힙, 디프스텐실 서술자 원소의 크기
+	ID3D12Resource *m_pd3dDepthStencilBuffer;
+	ID3D12DescriptorHeap *m_pd3dDsvDescriptorHeap;
+	UINT m_nDsvDescriptorIncrementSize;
 
-	// 명령 큐 포인터
-	ID3D12CommandQueue *m_pd3dCommandQueue;	
-	// 명령 할당자 포인터
-	ID3D12CommandAllocator *m_pd3dCommandAllocator;	
-	// 명령 리스트 인터페이스 포인터
-	ID3D12GraphicsCommandList *m_pd3dCommandList;	
+	//명령 큐, 명령 할당자, 명령 리스트 인터페이스
+	ID3D12CommandQueue *m_pd3dCommandQueue;
+	ID3D12CommandAllocator *m_pd3dCommandAllocator;
+	ID3D12GraphicsCommandList *m_pd3dCommandList;
 
-	// 그래픽스 파이프라인 상태 객체에 대한 인터페이스 포인터
-	ID3D12PipelineState *m_pd3dPipelineState;	
+	//그래픽 파이프라인 상태
+	ID3D12PipelineState *m_pd3dPipelineState;
 
-	// 펜스 인터페이스 포인터
-	ID3D12Fence *m_pd3dFence;	
-	// 후면버퍼 펜스값
+	//펜스 인터페이스
+	ID3D12Fence *m_pd3dFence;
 	UINT64 m_nFenceValues[m_nSwapChainBuffers];
-	// 이벤트 핸들
-	HANDLE m_hFenceEvent;	
+	HANDLE m_hFenceEvent;
 
-	
-
-	
-
-#if defined (_DEBUG)
+	//if~endif: if의 내용이 참이면 endif까지 컴파일이 진행된다.
+#if defined(_DEBUG) 
 	ID3D12Debug *m_pd3dDebugController;
 #endif
-
-	// 뷰포트
-	D3D12_VIEWPORT m_d3dViewport;	
-
-	//씨저 사각형
-	D3D12_RECT m_d3dScissorRect;	
-
-	//게임 프레임워크에서 사용할 타이머이다.
-	GameTimer m_GameTimer;
-
-	//프레임 레이트를 주 윈도우의 캡션에 출력하기 위한 문자열이다.
-	_TCHAR m_pszFrameRate[50];
+	D3D12_VIEWPORT m_d3dViewport;
+	D3D12_RECT m_d3dScissorRect; //뷰포트와 씨저 사각형이다. 
 
 public:
 	GameFramework();
 	~GameFramework();
 
-	// 프레임워크를 초기화 하는 함수
-	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);	
-	
-	// 프레임워크 삭제
-	void OnDestroy();
+	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
+	// 주 윈도우가 생성되면 호출된다.
 
-	// 스왑체인 생성함수
-	void CreateSwapChain();	
+	void OnDestory();
+	void CreateSwapChain();
+	void CreateDirect3DDevice();
+	void CreateRtvAndDsvDescriptorHeaps();
+	void CreateCommandQueueAndList();
+	// 스왑체인, 디바이스, 서술자 힙, 명령 큐, 할당자, 리스트를 생성
 
-	// 디바이스 생성함수
-	void CreateDirect3DDevice();	
-
-	// 서술자 힙 생성함수
-	void CreateRtvAndDsvDescriptorHeaps();	
 	void CreateRenderTargetViews();
-	void CreateDepthStencilView();
+	void CreateDepthStencilViews();
 
-	// 명령 큐/할당자/리스트 생성함수
-	void CreateCommandQueueAndList(); 
 
-	// 렌더링할 메쉬 게임 객체 
-	void BuildObjects();	// 생성
-	void ReleaseObjects();	// 제거
+	void BuildObjects();
+	void ReleaseObjects();
+	// 렌더링할 메쉬와 게임 객체를 생성하고 소멸
 
-	// 프레임워크 핵심
-	void ProcessInput();	// 사용자 입력
-	void AnimateObjects();	// 애니메이션
-	void FrameAdvance();	// 렌더링
+	void ProcessInput();
+	void AnimateObject();
+	void FrameAdvance();
+	// 프레임위크의 핵심(사용자 입력, 애니메이션, 렌더링)을 구성하는 함수
 
-	// CPU - GPU 동기화 함수
-	void WaitForGpuComplete();	
+	void WaitForGpuComplete(); //CPU와 GPU를 동기화하는 함수이다. 
 
-	// 스왑체인 멤버함수
+	//[따라하기5 fullscreenmode]
 	void ChangeSwapChainState();
-
-	// 프레임
+	
 	void MoveToNextFrame();
 
-	// 윈도우 메시지 (마우스, 키보드 입력) 처리함수
 	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
-
-
+	// 윈도우의 메시지(키보드, 마우스 입력)을 처리하는 함수
 };
-

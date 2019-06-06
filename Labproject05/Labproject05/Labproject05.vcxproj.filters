@@ -14,7 +14,19 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Shader">
-      <UniqueIdentifier>{e8d4acc0-0a32-4045-8caf-059ad1f520d1}</UniqueIdentifier>
+      <UniqueIdentifier>{fc21bf35-95d8-4f71-8248-7ba70a96679e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameFramework">
+      <UniqueIdentifier>{9a876c8e-515c-41b8-9984-229bdadf82a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Labproject">
+      <UniqueIdentifier>{680e5aff-b53e-4147-a895-4400318a53d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{364ba012-2aa6-4fb9-9b2d-8897d284aa84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer">
+      <UniqueIdentifier>{67bb82f1-fe5c-4b8b-bd92-f46aa9f70464}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -27,38 +39,38 @@
     <ClInclude Include="Resource.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Labproject05.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="GameFramework.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>GameFramework</Filter>
     </ClInclude>
-    <ClInclude Include="GameTimer.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="LabProject05.h">
+      <Filter>Labproject</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Timer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Labproject05.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="GameFramework.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="GameTimer.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="LabProject05.cpp">
+      <Filter>Labproject</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Timer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Labproject05.rc">
+    <ResourceCompile Include="LabProject05.rc">
       <Filter>리소스 파일</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -66,12 +78,12 @@
     <Image Include="small.ico">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="Labproject05.ico">
+    <Image Include="LabProject05.ico">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shader.hlsl">
+    <FxCompile Include="Shaders.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>
