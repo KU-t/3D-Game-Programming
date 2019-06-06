@@ -7,7 +7,7 @@ class GameFramework {
 	HWND m_hWnd;
 	
 	//scene 
-	CScene *m_pScene;
+	Scene *m_pScene;
 
 	int m_nWndClientWidth;
 	int m_nWndClientHeight;
