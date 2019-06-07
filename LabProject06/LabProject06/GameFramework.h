@@ -2,11 +2,13 @@
 #include "Timer.h"
 #include "Scene.h"
 
-class GameFramework{
+class GameFramework {
 private:
 
-	GameTimer m_GameTimer;//게임 프레임워크에서 사용할 타이머
-	_TCHAR m_pszFrameRate[50]; //프레임 레이트를 주 윈도우의 캡션에 출력하기 위한 문자열
+	//게임 프레임워크에서 사용할 타이머
+	GameTimer m_GameTimer;
+	//프레임 레이트를 주 윈도우의 캡션에 출력하기 위한 문자열
+	_TCHAR m_pszFrameRate[50];
 
 	// Scene
 	Scene *m_pScene;
@@ -17,14 +19,18 @@ private:
 	int m_nWndClientHeight;
 
 	IDXGIFactory4* m_pdxgiFactory;
-	IDXGISwapChain3* m_pdxgiSwapChain; // 디스플레이 제어를 위해
-	ID3D12Device* m_pd3dDevice; // 리소스 생성을 위해
+	// 디스플레이 제어를 위해
+	IDXGISwapChain3* m_pdxgiSwapChain;
+	// 리소스 생성을 위해
+	ID3D12Device* m_pd3dDevice;
 
 	bool m_bMsaa4xEnable = false;
-	UINT m_nMsaa4xQualityLevels = 0; // 다중 샘플링을 활성화, 다중 샘플링 레벨을 설정
+	// 다중 샘플링을 활성화, 다중 샘플링 레벨을 설정
+	UINT m_nMsaa4xQualityLevels = 0;
 
 	static const UINT m_nSwapChainBuffers = 2; //스왑체인 백버퍼 수
-	UINT m_nSwapChainBufferIndex; //스왑체인 백버퍼 현재 인덱스
+	//스왑체인 백버퍼 현재 인덱스
+	UINT m_nSwapChainBufferIndex;
 
 	//렌더 타켓, 서술자 힙, 렌더 타켓 서술자 원소의 크기
 	ID3D12Resource *m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
@@ -87,7 +93,7 @@ public:
 
 	//[따라하기5 fullscreenmode]
 	void ChangeSwapChainState();
-	
+
 	void MoveToNextFrame();
 
 	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);

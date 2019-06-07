@@ -2,7 +2,7 @@
 #include "Mesh.h"
 class Shader;
 
-class GameObject{
+class GameObject {
 public:
 	GameObject();
 	virtual ~GameObject();
@@ -17,7 +17,7 @@ public:
 			delete this;
 	}
 
-protected: 
+protected:
 	XMFLOAT4X4 m_xmf4x4World;
 	Mesh *m_pMesh = NULL;
 

@@ -11,7 +11,7 @@ struct VS_OUTPUT {
 };
 
 //정점 셰이더를 정의한다.
-VS_OUTPUT VSMain(VS_INPUT input) { 
+VS_OUTPUT VSMain(VS_INPUT input) {
 	VS_OUTPUT output;
 
 	//정점의 위치 벡터는 투영좌표계로 표현되어 있으므로 변환하지 않고 그대로 출력한다.
@@ -19,7 +19,7 @@ VS_OUTPUT VSMain(VS_INPUT input) {
 
 	//입력되는 픽셀의 색상(래스터라이저 단계에서 보간하여 얻은 색상)을 그대로 출력한다.
 	output.color = input.color;
-	
+
 	return output;
 }
 

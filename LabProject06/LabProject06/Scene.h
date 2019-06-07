@@ -2,7 +2,7 @@
 #include "Timer.h"
 #include "Shader.h"
 
-class Scene{
+class Scene {
 public:
 	Scene();
 	~Scene();
@@ -27,19 +27,19 @@ public:
 	ID3D12RootSignature *GetGraphicsRootSignature();
 
 
-protected: 
+protected:
 	//씬은 셰이더들의 집합이다. 셰이더들은 게임 객체들의 집합이다.
 	Shader **m_ppShaders = NULL;
 	int m_nShaders = 0;
 	ID3D12RootSignature *m_pd3dGraphicsRootSignature = NULL;
 
-/* // [Lab05]
-public:
-	//루트 시그너쳐를 나타내는 인터페이스 포인터이다.
-	ID3D12RootSignature *m_pd3dGraphicsRootSignature;
-	//파이프라인 상태를 나타내는 인터페이스 포인터이다.
-	ID3D12PipelineState *m_pd3dPipelineState; 
-*/
+	/* // [Lab05]
+	public:
+		//루트 시그너쳐를 나타내는 인터페이스 포인터이다.
+		ID3D12RootSignature *m_pd3dGraphicsRootSignature;
+		//파이프라인 상태를 나타내는 인터페이스 포인터이다.
+		ID3D12PipelineState *m_pd3dPipelineState;
+	*/
 };
 
 
