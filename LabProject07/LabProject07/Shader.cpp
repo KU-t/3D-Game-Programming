@@ -1,11 +1,9 @@
 #include "stdafx.h"
 #include "Shader.h"
 
-
 Shader::Shader()
 {
 }
-
 
 Shader::~Shader() {
 	if (m_ppd3dPipelineStates) {
@@ -100,35 +98,34 @@ D3D12_BLEND_DESC Shader::CreateBlendState() {
 
 //입력 조립기에게 정점 버퍼의 구조를 알려주기 위한 구조체를 반환한다.
 D3D12_INPUT_LAYOUT_DESC Shader::CreateInputLayout() {
-	// 2가지의 입력 데이터 : 위치, 색원소 data를 저장
-	UINT nInputElementDescs = 2;
-
-	// 2가지의 입력 데이터 배열 생성
-	D3D12_INPUT_ELEMENT_DESC *pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-
-	// 정점은 위치 벡터(POSITION)와 색상(COLOR)을 가진다.
-	// 시멘틱 문자열, 시멘틱 인덱스, 원소의 데이터형, 입력슬롯(최대 16개), 정렬 오프셋, 데이터 유형(정점, 객체), 몇개의 객체에 반복되는가(0 == 정점 데이터)
-	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-
+	
 	// Input Layout DESC 생성 : 입력 원소들의 배열
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	// Input Layout DESC - 원소의 배열 주소
-	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.pInputElementDescs = NULL;
 	// Input Layout DESC - 원소의 개수
-	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+	d3dInputLayoutDesc.NumElements = 0;
 	
 	return(d3dInputLayoutDesc);
 }
 
 //정점 셰이더 바이트 코드를 생성(컴파일)한다.
 D3D12_SHADER_BYTECODE Shader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob) {
-	return CompileShaderFromFile(L"Shaders.hlsl", "VSMain", "vs_5_1", ppd3dShaderBlob);
+	D3D12_SHADER_BYTECODE d3dShaderByteCode;
+	d3dShaderByteCode.BytecodeLength = 0;
+	d3dShaderByteCode.pShaderBytecode = NULL;
+
+	return(d3dShaderByteCode);
+
 }
 
 //픽셀 셰이더 바이트 코드를 생성(컴파일)한다.
 D3D12_SHADER_BYTECODE Shader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob) {
-	return CompileShaderFromFile((L"Shaders.hlsl"), "PSMain", "ps_5_1", ppd3dShaderBlob);
+	D3D12_SHADER_BYTECODE d3dShaderByteCode;
+	d3dShaderByteCode.BytecodeLength = 0;
+	d3dShaderByteCode.pShaderBytecode = NULL;
+
+	return(d3dShaderByteCode);
 }
 
 //셰이더 소스 코드를 컴파일하여 바이트 코드 구조체를 반환한다.
@@ -143,7 +140,7 @@ D3D12_SHADER_BYTECODE Shader::CompileShaderFromFile(const wchar_t *pszFileName, 
 	// Shader소스파일 이름, 쉐이더 매크로, #include의 여부, Shader함수 이름, Shader 버전, 컴파일 선택사항, 이펙트 선택사항, 코드(?)
 	::D3DCompileFromFile(pszFileName, NULL, NULL, pszShaderName, pszShaderProfile, nCompileFlags, 0, ppd3dShaderBlob, NULL);
 
-	// Shader 실행 코드
+	// Shader 실행 코드 (코드 내용)
 	D3D12_SHADER_BYTECODE d3dShaderByteCode;
 
 	// 실행 코드 사이즈
@@ -155,15 +152,9 @@ D3D12_SHADER_BYTECODE Shader::CompileShaderFromFile(const wchar_t *pszFileName, 
 }
 
 //그래픽스 파이프라인 상태 객체를 생성한다.
-void Shader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dRootSignature) {
+void Shader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dGraphicsRootSignature) {
 	
-	// [ GraphicsPipelineState 객체 생성 ]
-	// 1개의 GraphicsPipeline를 만들겠다
-	m_nPipelineStates = 1;
-
-	// 1개의 PipelineState를 할당
-	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
-	// VertexShader와 pixelShader 내용을 저장할 Blob 할당
+	// VertexShader와 PixelShader 내용을 저장할 Blob 할당
 	ID3DBlob *pd3dVertexShaderBlob = NULL, *pd3dPixelShaderBlob = NULL;
 
 	// Pipeline State Desc 생성
@@ -171,7 +162,7 @@ void Shader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dRoo
 	// Pipeline State Desc - 모든 변수 초기화 0 or NULL
 	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	// Pipeline State Desc - Root Signature의 주소
-	d3dPipelineStateDesc.pRootSignature = pd3dRootSignature;
+	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
 	// Pipeline State Desc - Vertex Shader 생성해 Blob에 저장
 	d3dPipelineStateDesc.VS = CreateVertexShader(&pd3dVertexShaderBlob);
 	// Pipeline State Desc - Pixel Shader 생성해 Blob에 저장
@@ -192,16 +183,18 @@ void Shader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dRoo
 	d3dPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	// RenderTarget 개수
 	d3dPipelineStateDesc.NumRenderTargets = 1;
-	// RenderTarget 포맷 R8G8B8A8
+	// RenderTarget 포맷 : R8G8B8A8
 	d3dPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	// DepthSencil 포맷 
 	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	d3dPipelineStateDesc.SampleDesc.Count = 1;
+	// (?)
+	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
 	// Graphics Pipeline State 생성 - 생성한 Desc를 Pipeline States배열의 0번째로
 	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void **)&m_ppd3dPipelineStates[0]);
-	
-	// (의미가 ?)
+
+	// com객체 Release
 	if (pd3dVertexShaderBlob) pd3dVertexShaderBlob->Release();
 	if (pd3dPixelShaderBlob) pd3dPixelShaderBlob->Release();
 
@@ -209,40 +202,10 @@ void Shader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dRoo
 		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }
 
-//Shader 객체가 포함하는 게임 객체들을 생성한다.
-void Shader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList,void *pContext) {
-	// 삼각형 메쉬를 생성한다.
-	TriangleMesh *pTriangleMesh = new TriangleMesh(pd3dDevice, pd3dCommandList);
-
-	// Shader에서의 객체의 수 : 1
-	m_nObjects = 1;
-	// Shader에서의 게임 객체 리스트에 1개의 게임 객체를 생성할 메모리 할당
-	m_ppObjects = new GameObject*[m_nObjects];
-
-	// 리스트 0번자리에 할당하고 게임객체 생성
-	m_ppObjects[0] = new GameObject();
-	m_ppObjects[0]->SetMesh(pTriangleMesh);
-}
-
-void Shader::ReleaseObjects() {
-	if (m_ppObjects) {
-		for (int j = 0; j < m_nObjects; j++)
-			if (m_ppObjects[j]) delete m_ppObjects[j];
-		delete[] m_ppObjects;
-	}
-}
-
-void Shader::AnimateObjects(float fTimeElapsed) {
-	for (int j = 0; j < m_nObjects; j++) {
-		m_ppObjects[j]->Animate(fTimeElapsed);
-	}
-}
-
-void Shader::ReleaseUploadBuffers() { 
-	if (m_ppObjects) {
-		for (int j = 0; j < m_nObjects; j++)
-			if (m_ppObjects[j]) m_ppObjects[j]->ReleaseUploadBuffers();
-	}
+void Shader::UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT4X4 *pxmf4x4World) {
+	XMFLOAT4X4 xmf4x4World;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(pxmf4x4World)));
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
 }
 
 void Shader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList) {
@@ -250,9 +213,43 @@ void Shader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList) {
 	pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[0]);
 }
 
-void Shader::Render(ID3D12GraphicsCommandList *pd3dCommandList) {
+void Shader::Render(ID3D12GraphicsCommandList *pd3dCommandList, Camera *pCamera) {
 	OnPrepareRender(pd3dCommandList);
-	for (int j = 0; j < m_nObjects; j++) {
-		if (m_ppObjects[j]) m_ppObjects[j]->Render(pd3dCommandList);
-	}
+}
+
+DiffusedShader::DiffusedShader() {
+
+}
+
+DiffusedShader::~DiffusedShader() {
+
+}
+
+D3D12_INPUT_LAYOUT_DESC DiffusedShader::CreateInputLayout(){
+	UINT nInputElementDescs = 2;
+	
+	D3D12_INPUT_ELEMENT_DESC *pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+
+	return(d3dInputLayoutDesc);
+}
+
+D3D12_SHADER_BYTECODE DiffusedShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob) {
+	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "VSDiffused", "vs_5_1", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE DiffusedShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob) {
+	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "PSDiffused", "ps_5_1", ppd3dShaderBlob));
+}
+
+void DiffusedShader::CreateShader(ID3D12Device * pd3dDevice, ID3D12RootSignature * pd3dGraphicsRootSignature){
+	m_nPipelineStates = 1;
+	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
+
+	Shader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 }

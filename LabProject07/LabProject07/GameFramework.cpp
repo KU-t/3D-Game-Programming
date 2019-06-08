@@ -104,6 +104,7 @@ inline void GameFramework::CreateSwapChain() {
 	RECT rcClient;
 	::GetClientRect(m_hWnd, &rcClient);
 
+	// 클라이언트 사각형 정보 저장
 	m_nWndClientWidth = rcClient.right - rcClient.left;
 	m_nWndClientHeight = rcClient.bottom - rcClient.top;
 
@@ -136,11 +137,6 @@ inline void GameFramework::CreateSwapChain() {
 	dxgiSwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
 	// SwapChain Desc - 출력 윈도우의 핸들
 	dxgiSwapChainDesc.OutputWindow = m_hWnd;
-
-	// SwapChain Desc -  모니터 해상도에 맞게 확대하는 방법
-	//dxgiSwapChainDesc.BufferDesc.Scaling = DXGI_SCALING_NONE; 
-	// SwapChain Desc - (뭐지?)
-	//dxgiSwapChainDesc.BufferDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 
 	// Swap Chain 생성
 	// Command Queue, SwapChain Desc, 저장할 주소
@@ -224,31 +220,23 @@ void GameFramework::CreateDirect3DDevice() {
 
 	d3dMsaaQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
 	d3dMsaaQualityLevels.NumQualityLevels = 0;
-	m_pd3dDevice->CheckFeatureSupport
-	(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &d3dMsaaQualityLevels,
-		sizeof(D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS));
+	m_pd3dDevice->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS,
+		&d3dMsaaQualityLevels, sizeof(D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS));
+	
 	//디바이스가 지원하는 다중 샘플의 품질 수준을 확인한다. 
 	m_nMsaa4xQualityLevels = d3dMsaaQualityLevels.NumQualityLevels;
+	
 	//다중 샘플의 품질 수준이 1보다 크면 다중 샘플링을 활성화한다. 
 	m_bMsaa4xEnable = (m_nMsaa4xQualityLevels > 1) ? true : false;
 
 	//m_nFenceValue = 0; //펜스를 생성하고 펜스 값을 0으로 설정한다.
 	m_pd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void **)&m_pd3dFence);
+	
 	/*펜스와 동기화를 위한 이벤트 객체를 생성한다(이벤트 객체의 초기값을 FALSE이다).
 	  이벤트가 실행되면(Signal) 이 벤트의 값을 자동적으로 FALSE가 되도록 생성한다.*/
 	m_hFenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 
 
-	//뷰포트를 주 윈도우의 클라이언트 영역 전체로 설정한다.
-	m_d3dViewport.TopLeftX = 0;
-	m_d3dViewport.TopLeftY = 0;
-	m_d3dViewport.Width = static_cast<float>(m_nWndClientWidth);
-	m_d3dViewport.Height = static_cast<float>(m_nWndClientHeight);
-	m_d3dViewport.MinDepth = 0.0f;
-	m_d3dViewport.MaxDepth = 1.0f;
-
-	//씨저 사각형을 주 윈도우의 클라이언트 영역 전체로 설정한다.
-	m_d3dScissorRect = { 0, 0, m_nWndClientWidth, m_nWndClientHeight };
 
 	if (pd3dAdapter) pd3dAdapter->Release();
 }
@@ -331,44 +319,68 @@ void GameFramework::CreateRenderTargetViews(){
 	}
 }
 
+// 깊이 - 스텐실 뷰 생성
 void GameFramework::CreateDepthStencilViews(){
 	// Resource Desc 생성
 	D3D12_RESOURCE_DESC d3dResourceDesc;
-	// Resource Desc - 
+	// Resource Desc - 리소스 종류 : 2D 텍스쳐
 	d3dResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	// Resource Desc - 리소스가 어떻게 정렬되는가? : 0 == 64KB
 	d3dResourceDesc.Alignment = 0;
+	// Resource Desc - 가로 크기 : 클라이언트 가로 길이
 	d3dResourceDesc.Width = m_nWndClientWidth;
+	// Resource Desc - 세로 크기 : 클라이언트 세로 길이
 	d3dResourceDesc.Height = m_nWndClientHeight;
+	// Resource Desc - 깊이 또는 배열의 크기
 	d3dResourceDesc.DepthOrArraySize = 1;
+	// Resource Desc - 밉맵레벨
 	d3dResourceDesc.MipLevels = 1;
+	// Resource Desc - 리소스 형식 : 깊이 24비트 (부호화x 0 ~ 1), 스텐실 8비트 (부호 x 정수) 
 	d3dResourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	// Resource Desc - 다중 샘플링 (픽셀마다 샘플 개수) : 하면 4, 안하면 1개
 	d3dResourceDesc.SampleDesc.Count = (m_bMsaa4xEnable) ? 4 : 1;
+	// Resource Desc - 다중 샘플링 : 하면 레벨 - 1, 품질 레벨 0 == 다중 샘플링 하지 않음
 	d3dResourceDesc.SampleDesc.Quality = (m_bMsaa4xEnable) ? (m_nMsaa4xQualityLevels - 1) : 0;
+	// Resource Desc - 다차원 리소스를 1차원 리소스로 매핑하기 위한 방법 : 어댑터에 의존
 	d3dResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	// Resource Desc - 어떤 뷰에서 사용 가능한지 : DSV 허용
 	d3dResourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
-	// 힙 생성
+	// Resource Heap Desc 생성
 	D3D12_HEAP_PROPERTIES d3dHeapProperties;
+	// Resource Heap Desc - 초기화
 	::ZeroMemory(&d3dHeapProperties, sizeof(D3D12_HEAP_PROPERTIES));
+	// Resource Heap Desc - 힙의 유형 : GPU 읽고 쓰기, CPU 불가 (대부분의 리소스)
 	d3dHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+	// Resource Heap Desc - 힙에 대한 CPU 페이지 속성 (CPU가 어떻게 접근 가능한가, 불가한가)
 	d3dHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	// Resource Heap Desc - 힙에 대한 메모리 풀( CPU vs GPU 대역폭이 어디가 더 큰가 )
 	d3dHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	// Resource Heap Desc - GPU 어댑터 : 0 == 1개이상 // 1 == 1개
 	d3dHeapProperties.CreationNodeMask = 1;
+	// Resource Heap Desc - 다중 어댑터에서 리소스를 볼 수 있는 노드 집합 (어떤 GPU가 접근할수 있나?)
 	d3dHeapProperties.VisibleNodeMask = 1;
 
+	// 최적의 지우기 연산을 위해
+	// Clear Value Desc 생성
 	D3D12_CLEAR_VALUE d3dClearValue;
+	// Clear Value Desc - 어떤 포멧인가
 	d3dClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	// Clear Value Desc - 깊이값 (0.0 ~ 1.0)
 	d3dClearValue.DepthStencil.Depth = 1.0f;
+	// Clear Value Desc - 스텐실 값 (0 ~ 255)
 	d3dClearValue.DepthStencil.Stencil = 0;
 
 
-	//깊이-스텐실 버퍼를 생성한다.
+	// Device에 깊이-스텐실 버퍼를 생성한다.
+	// Heap Properties Desc 주소,  힙 옵션 : 없음, Resource Desc 주소, Resource State (상태), 연산 주소(?), 어떤 형태로, 저장할 주소
 	m_pd3dDevice->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE, &d3dResourceDesc,
 		D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dClearValue, __uuidof(ID3D12Resource), (void **)&m_pd3dDepthStencilBuffer);
 
-	//깊이-스텐실 버퍼 뷰를 생성한다.
+	// 깊이-스텐실 서술자의 힙 시작 주소를 받는다
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	// 힙의 내용을 버퍼로
+	
+	// 깊이-스텐실 버퍼에 깊이-스텐실 서술자 핸들을 넣는다
 	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, NULL, d3dDsvCPUDescriptorHandle);
 }
 
@@ -383,71 +395,74 @@ void GameFramework::FrameAdvance(){
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
-	//뷰포트와 씨저 사각형을 설정한다.
-	m_pd3dCommandList->RSSetViewports(1, &m_d3dViewport);
-	m_pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect);
-
-	/*현재 렌더 타겟에 대한 프리젠트가 끝나기를 기다린다.
-	프리젠트가 끝나면 렌더 타겟 버퍼의 상태는 프리젠트 상태
-	(D3D12_RESOURCE_STATE_PRESENT)에서 렌더 타겟 상태(D3D12_RESOURCE_STATE_RENDER_TARGET)로 바 뀔 것이다.*/
-	D3D12_RESOURCE_BARRIER d3dResourceBarrier; //리소스 장벽[선미]
+	// Resource Barrier 생성
+	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
+	// Resource Barrier - 초기화
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));
+	// Resource Barrier - 유형 : 전이 장벽
 	d3dResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	// Resource Barrier - 리소스 장벽을 분리 하기 위한 설정 
 	d3dResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	// Resource Barrier - 상태전이 대상 리소스 : 새로 할당한 렌더타겟 버퍼
 	d3dResourceBarrier.Transition.pResource = m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex];
+	// Resource Barrier - 이전 상태 : 'PRESENT를 목표로 사용'
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	// Resource Barrier - 이후 상태 : '렌더 타겟을 목표로 사용'
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	// Resource Barrier - 서브 리소스의 인덱스 : 모든 서브 리소스
 	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	// Resource Barrier
+	// 배열 원소의 개수, 배열 주소
 	m_pd3dCommandList->ResourceBarrier(1, &d3dResourceBarrier);
 
-	//현재의 렌더 타겟에 해당하는 서술자의 CPU 주소(핸들)를 계산한다.
+	// 렌더 타겟에 해당하는 서술자의 CPU 시작 주소(핸들)를 받아
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle =
 		m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	// 현재의 렌더 타겟에 해당하는 주소를 계산한다.
 	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * m_nRtvDescriptorIncrementSize);
 
-	//깊이-스텐실 서술자의 CPU 주소를 계산한다. 
+	//깊이-스텐실 서술자의 CPU 시작 주소를 받아온다.
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle =
 		m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-	//렌더 타겟 뷰(서술자)와 깊이-스텐실 뷰(서술자)를 출력-병합 단계(OM)에 연결한다.
-	//렌더링 코드는 여기에 추가될 것이다.
+	// 렌더 타겟 뷰, 깊이-스텐실 뷰를 출력-병합 단계(OM)에 연결
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
-	//원하는 색상으로 렌더 타겟(뷰)을 지운다.
+	// 원하는 색상으로 렌더 타겟 뷰를 지운다.
 	float pfClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor, 0, NULL);
 
-	//원하는 값으로 깊이-스텐실(뷰)을 지운다.
+	// 원하는 값으로 깊이-스텐실(뷰)을 지운다.
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 
-	if (m_pScene) m_pScene->Render(m_pd3dCommandList);
+	// 렌더링
+	if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
 
 	
-	/*현재 렌더 타겟에 대한 렌더링이 끝나기를 기다린다. GPU가 렌더 타겟(버퍼)을
-	더 이상 사용하지 않으면 렌더 타겟 의 상태는 프리젠트 상태(D3D12_RESOURCE_STATE_PRESENT)로 바뀔 것이다.*/
+	/*현재 렌더 타겟에 대한 렌더링이 끝나기를 기다린다.*/
+
+	// 렌더링 이후 Resource Barrier 변경
+	// Resource Barrier - 이전 상태 : '렌더 타겟을 목표로 사용'
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	// Resource Barrier - 이후 상태 : 'PRESENT를 목표로 사용'
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	// Resource Barrier - 서브 리소스의 인덱스 : 모든 서브 리소스
 	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	// Resource Barrier
+	// 배열 원소의 개수, 배열 주소
 	m_pd3dCommandList->ResourceBarrier(1, &d3dResourceBarrier);
 	
-	//명령 리스트를 닫힌 상태로 만든다.
+	// 명령 리스트를 닫힌 상태
 	hResult = m_pd3dCommandList->Close(); 
 
-	//명령 리스트를 명령 큐에 추가하여 실행한다.
+	// 명령 리스트를 명령 큐에 추가
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(_countof(ppd3dCommandLists)/*1*/, ppd3dCommandLists);
 	
-	//GPU가 모든 명령 리스트를 실행할 때 까지 기다린다.
+	// GPU가 모든 명령 리스트를 실행할 때 까지 기다린다.
 	WaitForGpuComplete(); 
-
-	///*스왑체인을 프리젠트한다. 프리젠트를 하면 현재 렌더 타겟(후면버퍼)의
-	//내용이 전면버퍼로 옮겨지고 렌더 타겟 인 덱스가 바뀔 것이다.*/
-	//DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
-	//dxgiPresentParameters.DirtyRectsCount = 0;
-	//dxgiPresentParameters.pDirtyRects = NULL;
-	//dxgiPresentParameters.pScrollRect = NULL;
-	//dxgiPresentParameters.pScrollOffset = NULL;
 	
+	// 렌더링 된 영상을 Present - 디스플레이 출력
 	m_pdxgiSwapChain->Present(0, 0 /*&dxgiPresentParameters*/);
 
 	MoveToNextFrame();
@@ -539,6 +554,25 @@ void GameFramework::BuildObjects(){
 	// 커맨드 리스트 생성
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
+	// 카메라 객체를 생성
+	m_pCamera = new Camera();
+	
+	// 뷰포트 설정 및 생성
+	// 그려질 x, 그려질 y, 그려질 가로 크기, 그려질 세로 크기, Minz, Maxz
+	m_pCamera->SetViewport(0, 0, m_nWndClientWidth, m_nWndClientHeight, 0.0f, 1.0f);
+	
+	// 씨저 사각형 설정 및 생성
+	// 시작 x, 시작 y, 끝 x, 끝 y
+	m_pCamera->SetScissorRect(0, 0, m_nWndClientWidth, m_nWndClientHeight);
+	
+	// 투영 변환 행렬 설정 및 생성
+	//  FarZ(근 평명), NearZ(원 평면), FovAngleY(종횡비), AspectRatio(FOV)
+	m_pCamera->GenerateProjectionMatrix(1.0f, 500.0f, float(m_nWndClientWidth) / float(m_nWndClientHeight), 90.0f);
+	
+	// 카메라 변환 행렬 설정 및 생성
+	// Camera Position, Camera Lookat, Camera Up
+	m_pCamera->GenerateViewMatrix(XMFLOAT3(0.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+
 	//Scene 생성 -> Scene 객체 생성
 	m_pScene = new Scene();
 	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
@@ -562,57 +596,80 @@ void GameFramework::ReleaseObjects(){
 		m_pScene->ReleaseObjects();
 		delete m_pScene;
 	}
-
 }
 
 void GameFramework::ProcessInput(){
 }
 
 void GameFramework::AnimateObject(){
-	if (m_pScene) m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed());
-
+	if (m_pScene)
+		m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed());
 }
 
 
 // [따라하기 5번 fullscreenmode ]
 void GameFramework::ChangeSwapChainState(){
-	WaitForGpuComplete(); //gpu가 끝날때까지 기다려줘
+	//gpu가 끝날때까지 기다려줘
+	WaitForGpuComplete(); 
 	
 	BOOL bFullScreenstate = false; 
-	// 현재 상태 받아와
+	// 현재 스크린 모드를 받아와
 	m_pdxgiSwapChain->GetFullscreenState(&bFullScreenstate, nullptr);
-	// 현재상태의 반대상태로 설정
+	// 현재 스크린 모드의 반대로 설정
 	m_pdxgiSwapChain->SetFullscreenState(!bFullScreenstate, nullptr); 
 
-	// 
+	// Swap Chain 크기 변경
+	// Target Parameter Desc 생성
 	DXGI_MODE_DESC dxgiTargetParameters;
+	// Target Parameter Desc - 포멧 : RGBA (노말라이징x)
 	dxgiTargetParameters.Format = DXGI_FORMAT_R8G8B8A8_UNORM; 
+	// Target Parameter Desc - 가로 크기 : 클라이언트 가로 크기로
 	dxgiTargetParameters.Width = m_nWndClientWidth; 
+	// Target Parameter Desc - 세로 크기 : 클라이언트 세로 크기로
 	dxgiTargetParameters.Height = m_nWndClientHeight; 
+	// Target Parameter Desc - 프레임 : 60Hz (1초에 60번)
 	dxgiTargetParameters.RefreshRate.Numerator = 60; 
 	dxgiTargetParameters.RefreshRate.Denominator = 1; 
+	// Target Parameter Desc - 모니터 해상도에 맞게 확대방법 : 알아서 해
 	dxgiTargetParameters.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	// Target Parameter Desc - 스캔라인 그리기 모드 지정 : 스캔 라인 순서를 지정하지 않음
 	dxgiTargetParameters.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED; 
+	
+	// 스왑체인이 윈도우 모드 일때, 윈도우의 크기 변경
+	// 스왑체인이 전체 화면 모드 일때, 바탕화면 모드 변경
 	m_pdxgiSwapChain->ResizeTarget(&dxgiTargetParameters);
 
+	// 모든 렌더타겟 뷰 (com 객체) Release
+	// 클리이언트 영역의 크기가 변경되면, DXGI가 알아서 전면버퍼 크기 변경
+	// 후면버퍼 크기를 변경전에 후면버퍼의 참조를 해제해야함
 	for (int i = 0; i < m_nSwapChainBuffers; i++) 
 		if (m_ppd3dRenderTargetBuffers[i]) m_ppd3dRenderTargetBuffers[i]->Release();
 
+	// 스왑체인의 크기 변경
 	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc; 
+	// 현재 스왑체인을 받아
 	m_pdxgiSwapChain->GetDesc(&dxgiSwapChainDesc); 
-	m_pdxgiSwapChain->ResizeBuffers
-	(m_nSwapChainBuffers, m_nWndClientWidth, m_nWndClientHeight, 
+	// 스왑체인의 버퍼 개수, 바꿀 클라이언트 가로 영역,세로 영역, 바꿀 후면버퍼의 형식(유지), 스왑체인 flag
+	m_pdxgiSwapChain->ResizeBuffers(m_nSwapChainBuffers, m_nWndClientWidth, m_nWndClientHeight, 
 		dxgiSwapChainDesc.BufferDesc.Format, dxgiSwapChainDesc.Flags);
+	// 현재 스왑체인의 인덱스를 받아
 	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
 
+	// 렌더 타겟을 변경된 값으로 다시 생성 
 	CreateRenderTargetViews();
 }
 
 void GameFramework::MoveToNextFrame() {
+	// 현재 스왑체인 버퍼의 인덱스를 받아
 	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
+	// 현재 스왑체인 버퍼에 해당하는 펜스를 넘기고 1을 더해 둬
 	UINT64 nFenceValue = ++m_nFenceValues[m_nSwapChainBufferIndex];
+	// 현재 펜스값을 설정하는 명령큐를 마지막에 넣어
 	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence, nFenceValue);
+
+	// 현재의 펜스값을 받아 스왑체인의 펜스값 보다 작을때,
 	if (m_pd3dFence->GetCompletedValue() < nFenceValue) {
+		// 스왑체인의 값이 되면, Event를 깨워
 		hResult = m_pd3dFence->SetEventOnCompletion(nFenceValue, m_hFenceEvent);
 		::WaitForSingleObject(m_hFenceEvent, INFINITE); 
 	}

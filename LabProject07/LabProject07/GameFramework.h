@@ -1,5 +1,4 @@
 #pragma once
-#include "Timer.h"
 #include "Scene.h"
 
 class GameFramework{
@@ -12,6 +11,8 @@ private:
 
 	// Scene
 	Scene *m_pScene;
+	// Camera
+	Camera *m_pCamera = NULL;
 
 	HINSTANCE m_hInstance;
 	HWND m_hWnd;
@@ -32,14 +33,18 @@ private:
 	//스왑체인 백버퍼 현재 인덱스
 	UINT m_nSwapChainBufferIndex; 
 
-	//렌더 타켓, 서술자 힙, 렌더 타켓 서술자 원소의 크기
+	// 렌더 타겟 버퍼
 	ID3D12Resource *m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
+	// 렌더 타켓 서술자 힙 주소
 	ID3D12DescriptorHeap *m_pd3dRtvDescriptorHeap;
+	// 렌더 타켓 서술자 원소의 크기
 	UINT m_nRtvDescriptorIncrementSize;
 
-	//디프스텐실 버퍼, 서술자 힙, 디프스텐실 서술자 원소의 크기
+	// 깊이-스텐실 버퍼
 	ID3D12Resource *m_pd3dDepthStencilBuffer;
+	// 디프스텐실 서술자 힙 주소
 	ID3D12DescriptorHeap *m_pd3dDsvDescriptorHeap;
+	// 디프스텐실 서술자 원소의 크기
 	UINT m_nDsvDescriptorIncrementSize;
 
 	//명령 큐, 명령 할당자, 명령 리스트 인터페이스
@@ -59,45 +64,49 @@ private:
 #if defined(_DEBUG) 
 	ID3D12Debug *m_pd3dDebugController;
 #endif
-	D3D12_VIEWPORT m_d3dViewport;
-	D3D12_RECT m_d3dScissorRect; //뷰포트와 씨저 사각형이다. 
 
 public:
 	GameFramework();
 	~GameFramework();
 
-	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
 	// 주 윈도우가 생성되면 호출된다.
+	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
 
 	void OnDestory();
-	void CreateSwapChain();
-	void CreateDirect3DDevice();
-	void CreateRtvAndDsvDescriptorHeaps();
-	void CreateCommandQueueAndList();
-	// 스왑체인, 디바이스, 서술자 힙, 명령 큐, 할당자, 리스트를 생성
 
+	// 스왑체인 생성
+	void CreateSwapChain();
+	// 디바이스 생성
+	void CreateDirect3DDevice();
+	// 서술자 힙 생성
+	void CreateRtvAndDsvDescriptorHeaps();
+	// 명령 큐, 할당자, 리스트 생성
+	void CreateCommandQueueAndList();
+	// 렌더 타겟 뷰 생성
 	void CreateRenderTargetViews();
+	// 깊이 - 스텐실 뷰 생성
 	void CreateDepthStencilViews();
 
-
+	// 렌더링할 메쉬와 게임 객체를 생성
 	void BuildObjects();
+	// 렌더링할 메쉬와 게임 객체를 소멸
 	void ReleaseObjects();
-	// 렌더링할 메쉬와 게임 객체를 생성하고 소멸
 
+	// 프레임위크의 핵심(사용자 입력, 애니메이션, 렌더링)을 구성하는 함수
 	void ProcessInput();
 	void AnimateObject();
 	void FrameAdvance();
-	// 프레임위크의 핵심(사용자 입력, 애니메이션, 렌더링)을 구성하는 함수
 
-	void WaitForGpuComplete(); //CPU와 GPU를 동기화하는 함수이다. 
+	// CPU와 GPU를 동기화하는 함수이다. 
+	void WaitForGpuComplete(); 
 
 	//[따라하기5 fullscreenmode]
 	void ChangeSwapChainState();
 	
 	void MoveToNextFrame();
 
+	// 윈도우의 메시지(키보드, 마우스 입력)을 처리하는 함수
 	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
-	// 윈도우의 메시지(키보드, 마우스 입력)을 처리하는 함수
 };

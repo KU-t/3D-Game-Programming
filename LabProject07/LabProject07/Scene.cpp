@@ -19,20 +19,26 @@ void Scene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd
 	// GraphicsRootSignature를 (GameFramework)pd3dDevice에 생성
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	// Scene을 그리기 위한 Shader 객체를 생성
-	// Scene은 총 1개
-	m_nShaders = 1;
-	// 1개의 Shader를 생성할 포인터 생성 - m_ppShaders는 m_nShaders개수만큼의 Shader를 배열로 관리
-	m_ppShaders = new Shader*[m_nShaders];
+	TriangleMesh *pMesh = new TriangleMesh(pd3dDevice, pd3dCommandList);
 
-	// 새로운 하나의 Shader를 생성
-	Shader *pShader = new Shader();
-	pShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature); 
+	// 객체 1개
+	m_nObjects = 1;
+	// 1개의 객체 주소 저장 메모리 할당 - m_ppObjects는 m_nObjects만큼의 객체를 주소 배열로 관리
+	m_ppObjects = new GameObject*[m_nObjects];
 
-	// Shader의 객체 생성
-	pShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
-	// Shader를 Shader관리 포인터에 추가
-	m_ppShaders[0] = pShader;
+	// 회전하는 객체 생성
+	RotatingObject *pRotatingObject = new RotatingObject();
+	// 회전하는 객체 설정
+	pRotatingObject->SetMesh(pMesh);
+
+	DiffusedShader *pShader = new DiffusedShader();
+	pShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	pRotatingObject->SetShader(pShader);
+
+	m_ppObjects[0] = pRotatingObject;
+
 }
 
 
@@ -40,14 +46,15 @@ void Scene::ReleaseObjects() {
 	//if (m_pd3dPipelineState) m_pd3dPipelineState->Release();
 
 	if (m_pd3dGraphicsRootSignature) m_pd3dGraphicsRootSignature->Release();
-	if (m_ppShaders) {
-		for (int i = 0; i < m_nShaders; i++) {
-			m_ppShaders[i]->ReleaseShaderVariables();
-			m_ppShaders[i]->ReleaseObjects();
-			m_ppShaders[i]->Release();
-		}
-		delete[] m_ppShaders;
+
+	if (m_ppObjects) {
+		for (int j = 0; j < m_nObjects; j++)
+			if (m_ppObjects[j])
+				delete m_ppObjects[j];
+
+		delete[] m_ppObjects;
 	}
+
 }
 
 
@@ -59,31 +66,37 @@ bool Scene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPara
 	return false;
 }
 
-bool Scene::ProcessInput() {
+bool Scene::ProcessInput(UCHAR *pKeysBuffer) {
 	return false;
 }
 
 void Scene::AnimateObjects(float fTimeElapsed) {
-	for (int i = 0; i < m_nShaders; i++) {
-		m_ppShaders[i]->AnimateObjects(fTimeElapsed);
+	for (int j = 0; j < m_nObjects; j++) {
+		m_ppObjects[j]->Animate(fTimeElapsed);
 	}
 
 }
 
-void Scene::Render(ID3D12GraphicsCommandList *pd3dCommandList) {
+void Scene::Render(ID3D12GraphicsCommandList *pd3dCommandList, Camera *pCamera){
+
+	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+
 	//그래픽 루트 시그너쳐를 파이프라인에 연결(설정)한다.
 	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 
-	//씬을 렌더링하는 것은 씬을 구성하는 셰이더(셰이더가 포함하는 객체)들을 렌더링하는 것이다.
-	for (int i = 0; i < m_nShaders; i++) {
-		m_ppShaders[i]->Render(pd3dCommandList);
+	if (pCamera) pCamera->UpdateShaderVariables(pd3dCommandList);
+
+	//씬을 렌더링하는 것은 씬을 구성하는 게임 객체(셰이더를 포함하는 객체)들을 렌더링하는 것이다.
+	for (int j = 0; j < m_nObjects; j++) {
+		if (m_ppObjects[j])
+			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
 	} 
 }
 
 void Scene::ReleaseUploadBuffers() {
-	if (m_ppShaders) {
-		for (int j = 0; j < m_nShaders; j++)
-			if (m_ppShaders[j]) m_ppShaders[j]->ReleaseUploadBuffers();
+	if (m_ppObjects) {
+		for (int j = 0; j < m_nObjects; j++)
+			if (m_ppObjects[j]) m_ppObjects[j]->ReleaseUploadBuffers();
 	}
 }
 
@@ -95,23 +108,58 @@ ID3D12RootSignature *Scene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevice
 	// [루트 시그니쳐 - 할당받을 포인터 생성] : 파이프라인의 전역변수
 	ID3D12RootSignature *pd3dGraphicsRootSignature = NULL;
 
+	// Root Parameters 생성 : 2개
+	D3D12_ROOT_PARAMETER pd3dRootParameters[2];
+
+	// 1번 Root Parameter
+	// 1번 Root Parameter - 유형 : 루트 상수
+	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+	// 1번 Root Parameter - 상수 개수 : 16개
+	pd3dRootParameters[0].Constants.Num32BitValues = 16;
+	// 1번 Root Parameter - 레지스터 번호 : 0
+	pd3dRootParameters[0].Constants.ShaderRegister = 0;
+	// 1번 Root Parameter - 레지스터 공간 : 0
+	pd3dRootParameters[0].Constants.RegisterSpace = 0;
+	// 1번 Root Parameter - 어떤 Shader에서 사용 가능한가? : Vertex Shader
+	pd3dRootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+
+	// 2번 Root Parameter
+	// 2번 Root Parameter - 유형 : 루트 상수
+	pd3dRootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+	// 2번 Root Parameter - 상수 개수 : 32개
+	pd3dRootParameters[1].Constants.Num32BitValues = 32;
+	// 2번 Root Parameter - 레지스터 번호 : 0
+	pd3dRootParameters[1].Constants.ShaderRegister = 1;
+	// 2번 Root Parameter - 레지스터 공간 : 0
+	pd3dRootParameters[1].Constants.RegisterSpace = 0;
+	// 2번 Root Parameter - 어떤 Shader에서 사용 가능한가? : Vertex Shader
+	pd3dRootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+
+	// 루트 시그니처 레이아웃(어떤 쉐이더에서 접근 가능한가.)
+	D3D12_ROOT_SIGNATURE_FLAGS d3dRootSignatureFlags =
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+
 	// [루트 시그니처 - 설정]
 	// 루트 시그니처 DESC 생성
 	D3D12_ROOT_SIGNATURE_DESC d3dRootSignatureDesc;
 	// 루트 시그니처 DESC - 모든 변수 초기화 0 or NULL
 	::ZeroMemory(&d3dRootSignatureDesc, sizeof(D3D12_ROOT_SIGNATURE_DESC));
-	// 루트 시그니처 DESC - root parameter 개수
-	d3dRootSignatureDesc.NumParameters = 0;
-	// 루트 시그니처 DESC - root parameter 주소
-	d3dRootSignatureDesc.pParameters = NULL;
+	// 루트 시그니처 DESC - root parameter 개수 : 2개
+	d3dRootSignatureDesc.NumParameters = _countof(pd3dRootParameters);
+	// 루트 시그니처 DESC - root parameter 시작 주소 : pd3dRootParameters
+	d3dRootSignatureDesc.pParameters = pd3dRootParameters;
 	// 루트 시그니처 DESC - static sampler 개수 (정점 샘플러의 개수)
 	d3dRootSignatureDesc.NumStaticSamplers = 0; 
 	// 루트 시그니처 DESC - static sampler 주소
 	d3dRootSignatureDesc.pStaticSamplers = NULL; 
 	// 루트 시그니처 DESC - 레이아웃(어떤 쉐이더에서 접근 가능한가.) : IA단계를 허용
-	d3dRootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	d3dRootSignatureDesc.Flags = d3dRootSignatureFlags;
 	
-	// Blob 생성 (뭐하는 애지?)
+	// Blob 생성
 	ID3DBlob *pd3dSignatureBlob = NULL; 
 	ID3DBlob *pd3dErrorBlob = NULL;
 

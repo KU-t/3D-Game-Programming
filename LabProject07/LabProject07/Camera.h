@@ -1,5 +1,5 @@
 #pragma once
-#define ASPECT_RATIO {float(FRAME_BUFFER_WIDTH) / float(FRAME_BUFFER_HEIGHT)}
+#define ASPECT_RATIO (float(FRAME_BUFFER_WIDTH) / float(FRAME_BUFFER_HEIGHT))
 
 struct VS_CB_CAMERA_INFO {
 	XMFLOAT4X4 m_xmf4x4View;
@@ -7,12 +7,12 @@ struct VS_CB_CAMERA_INFO {
 };
 
 class Camera {
-protected: 
-	//카메라 변환 행렬
+protected:
+	//카메라 변환 행렬 
 	XMFLOAT4X4 m_xmf4x4View;
-	//투영 변환 행렬
+	//투영 변환 행렬 
 	XMFLOAT4X4 m_xmf4x4Projection;
-	//뷰포트 
+	//뷰포트
 	D3D12_VIEWPORT m_d3dViewport;
 	//씨저 사각형
 	D3D12_RECT m_d3dScissorRect;
@@ -33,5 +33,3 @@ public:
 	
 	virtual void SetViewportsAndScissorRects(ID3D12GraphicsCommandList *pd3dCommandList);
 };
-
-

@@ -1,10 +1,2 @@
-﻿  stdafx.cpp
-  GameFramework.cpp
-  GameObject.cpp
-  LabProject06.cpp
-  Mesh.cpp
-  Scene.cpp
-  Shader.cpp
-  Timer.cpp
-  코드를 생성하고 있습니다...
+﻿  LabProject06.cpp
   LabProject06.vcxproj -> C:\Users\태균\Desktop\2019-1\3D_Game Programming\3D-Game-Programming\LabProject06\Debug\LabProject06.exe
