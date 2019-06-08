@@ -21,8 +21,8 @@ D3D12_RASTERIZER_DESC Shader::CreateRasterizerState() {
 	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
 	// Rasterizer Desc - 채우기 모드 : 면 채워서 그리기
 	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-	// Rasterizer Desc - 그리지 않을 방향 : 뒤
-	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	// Rasterizer Desc - 그리지 않을 방향 : 없음
+	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	// Rasterizer Desc - 전면이 반시계 방향인가?
 	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
 	// Rasterizer Desc - 깊이값에 더해질 깊이 바이어스
