@@ -68,11 +68,13 @@ void Mesh::Render(ID3D12GraphicsCommandList *pd3dCommandList) {
 void Mesh::Render(ID3D12GraphicsCommandList * pd3dCommandList, UINT nInstances){
 	// 입력조립기에 프리미티브 토폴로지를 Set한다.
 	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
+
 	// 인덱스 버퍼가 있다면 인덱스버퍼를 Set하고, 객체 수만큼 그린다.
 	if (m_pd3dIndexBuffer) {
 		pd3dCommandList->IASetIndexBuffer(&m_d3dIndexBufferView);
 		pd3dCommandList->DrawIndexedInstanced(m_nIndices, nInstances, 0, 0, 0);
 	}
+
 	// 인덱스 버퍼가 없다면 정점버퍼로 그린다.
 	else {
 		pd3dCommandList->DrawInstanced(m_nVertices, nInstances, m_nOffset, 0);
