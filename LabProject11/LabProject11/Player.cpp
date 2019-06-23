@@ -384,10 +384,16 @@ Camera * AirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed){
 			SetMaxVelocityXZ(125.0f);
 			SetMaxVelocityY(400.0f);
 			m_pCamera = OnChangeCamera(FIRST_PERSON_CAMERA, nCurrentCameraMode);
+
+			// 1인칭 카메라의 지연 효과를 설정한다. (0.f ~ 1.f)
 			m_pCamera->SetTimeLag(0.0f);
+			// 카메라가 캐릭터기준 어디에 위치하는가
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
+			// 카메라 절두체
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+			// 카메라 뷰포트
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
+			// 카메라 씨저
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT); 
 			break;
 		
@@ -398,10 +404,16 @@ Camera * AirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed){
 			SetMaxVelocityXZ(400.0f);
 			SetMaxVelocityY(400.0f);
 			m_pCamera = OnChangeCamera(SPACESHIP_CAMERA, nCurrentCameraMode);
+
+			// 자유시점 카메라의 지연 효과를 설정한다. (0.f ~ 1.f)
 			m_pCamera->SetTimeLag(0.0f);
+			// 카메라가 캐릭터기준 어디에 위치하는가
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 0.0f, 0.0f));
+			// 카메라 절두체
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+			// 카메라 뷰포트
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
+			// 카메라 씨저
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT); 
 			break; 
 		
@@ -413,7 +425,7 @@ Camera * AirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed){
 			SetMaxVelocityY(400.0f);
 			m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
 			
-			//3인칭 카메라의 지연 효과를 설정한다. (0.f ~ 1.f)
+			// 3인칭 카메라의 지연 효과를 설정한다. (0.f ~ 1.f)
 			m_pCamera->SetTimeLag(0.25f);
 			// 카메라가 캐릭터기준 어디에 위치하는가
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 60.0f, -50.0f));
