@@ -16,14 +16,15 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+#include <math.h>
 
 // [ 따라하기3 ] 
 // precompiled 
 #include <string>
 #include <wrl.h>
 
-#include <d3d12.h> 
 // direct3D12 API함수를 사용하기 위해 반드시 포함해야 한다.
+#include <d3d12.h> 
 #include <dxgi1_4.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
@@ -127,8 +128,8 @@ namespace Vector3 {
 	}
 
 	inline float Angle(XMFLOAT3 xmf3Vector1, XMFLOAT3 xmf3Vector2) {
-		XMFLOAT3 xmvVector1{ xmf3Vector1.x, xmf3Vector1.y, xmf3Vector1.z};
-		XMFLOAT3 xmvVector2{ xmf3Vector2.x, xmf3Vector2.y, xmf3Vector2.z };
+		XMVECTOR xmvVector1{ xmf3Vector1.x, xmf3Vector1.y, xmf3Vector1.z};
+		XMVECTOR xmvVector2{ xmf3Vector2.x, xmf3Vector2.y, xmf3Vector2.z };
 		return(Angle(xmvVector1, xmvVector2));
 	}
 

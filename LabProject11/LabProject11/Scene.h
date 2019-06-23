@@ -1,7 +1,7 @@
 #pragma once
-#include "Timer.h"
+
 #include "Shader.h"
-#include "Camera.h"
+#include "Player.h"
 
 class Scene{
 public:

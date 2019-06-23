@@ -254,16 +254,16 @@ void GameFramework::CreateCommandQueueAndList(){
 	// CommandQueue Desc - 설정 : 기본 명령 큐
 	d3dCommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 
-	// 직접(Direct) 명령 큐를 생성한다.
+	// 직접(Direct) 명령 큐를 생성
 	// CommandQueue Desc, uuidof, CommandQueue 저장할 주소
 	HRESULT hResult = m_pd3dDevice->CreateCommandQueue(&d3dCommandQueueDesc, _uuidof(ID3D12CommandQueue), (void **)&m_pd3dCommandQueue);
 	
-	// 직접(Direct) 명령 할당자를 생성한다.
+	// 직접(Direct) 명령 할당자를 생성
 	// Command Allocator - 유형 : GPU 직접 실행 가능한 명령 버퍼 (D3D12_COMMAND_LIST_TYPE_DIRECT)
 	// 유형, uuidof, Command Allocator 저장할 주소
 	hResult = m_pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void **)&m_pd3dCommandAllocator);
 	
-	// 직접(Direct) 명령 리스트를 생성한다.
+	// 직접(Direct) 명령 리스트를 생성
 	// 대상 어댑터 (GPU 하나면 0), 유형 : GPU 직접 실행 가능한 명령 버퍼, 명령어 리스트를 생성할 명령어 할당자, 초기 파이프라인 상태(NULL : 라이브러리가 알아서), uuidof, 저장 주소
 	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void **)&m_pd3dCommandList);
 	

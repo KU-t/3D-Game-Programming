@@ -1,3 +1,2 @@
 ﻿  Player.cpp
-c:\users\태균\desktop\2019-1\3d_game programming\3d-game-programming\labproject11\labproject11\stdafx.h(133): warning C4717: 'Vector3::Angle': 모든 제어 경로에서 재귀적입니다. 함수로 인해 런타임 스택 오버플로가 발생합니다.
   LabProject11.vcxproj -> C:\Users\태균\Desktop\2019-1\3D_Game Programming\3D-Game-Programming\LabProject11\Debug\LabProject11.exe

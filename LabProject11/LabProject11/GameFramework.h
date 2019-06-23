@@ -1,6 +1,7 @@
 #pragma once
-#include "Scene.h"
+#include "Timer.h"
 #include "Player.h"
+#include "Scene.h"
 
 class GameFramework{
 private:

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "GameObject.h"
-
+#include "Shader.h"
 
 GameObject::GameObject() {
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
@@ -12,7 +12,9 @@ GameObject::~GameObject() {
 }
 
 void GameObject::SetShader(Shader *pShader) {
-	m_pShader = pShader;
+	if (m_pShader) m_pShader->Release();
+	//m_pShader = pShader;
+	if (m_pShader) m_pShader->AddRef();
 }
 
 void GameObject::SetMesh(Mesh *pMesh) {
@@ -39,6 +41,10 @@ void GameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, Camera *pCam
 	
 	// 객체의 정보를 셰이더 변수(상수 버퍼)로 복사
 	UpdateShaderVariables(pd3dCommandList);
+	if (m_pShader) {
+		m_pShader->UpdateShaderVariable(pd3dCommandList, &m_xmf4x4World);
+		m_pShader->Render(pd3dCommandList, pCamera);
+	}
 
 	//게임 객체에 메쉬가 연결되어 있으면 메쉬를 렌더링한다.
 	if (m_pMesh)
