@@ -36,7 +36,7 @@ GameObject::~GameObject() {
 
 void GameObject::SetShader(Shader *pShader) {
 	if (m_pShader) m_pShader->Release();
-	//m_pShader = pShader;
+	m_pShader = pShader;
 	if (m_pShader) m_pShader->AddRef();
 }
 
@@ -77,8 +77,8 @@ void GameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, Camera *pCam
 
 	if (m_pShader)
 		m_pShader->Render(pd3dCommandList, pCamera);
-	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
 
+	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
 	if (m_ppMeshes) {
 		for (int i = 0; i < m_nMeshes; i++) {
 			if (m_ppMeshes[i])

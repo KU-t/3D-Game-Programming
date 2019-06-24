@@ -98,7 +98,8 @@ private:
 	HeightMapImage *m_pHeightMapImage;
 
 	//높이 맵의 가로와 세로 크기이다.
-	int m_nWidth; int m_nLength;
+	int m_nWidth;
+	int m_nLength;
 
 	//지형을 실제로 몇 배 확대할 것인가를 나타내는 스케일 벡터이다.
 	XMFLOAT3 m_xmf3Scale;

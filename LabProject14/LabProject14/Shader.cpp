@@ -8,7 +8,8 @@ Shader::Shader()
 Shader::~Shader() {
 	if (m_ppd3dPipelineStates) {
 		for (int i = 0; i < m_nPipelineStates; i++)
-			if (m_ppd3dPipelineStates[i]) m_ppd3dPipelineStates[i]->Release();
+			if (m_ppd3dPipelineStates[i])
+				m_ppd3dPipelineStates[i]->Release();
 		delete[] m_ppd3dPipelineStates;
 	}
 }
@@ -328,89 +329,49 @@ void ObjectsShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, Camera *
 
 void ObjectsShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, void *pContext) {
 	
-	HeightMapTerrain *pTerrain = (HeightMapTerrain *)pContext;
-	float fTerrainWidth = pTerrain->GetWidth(), fTerrainLength = pTerrain->GetLength();
+	//HeightMapTerrain *pTerrain = (HeightMapTerrain *)pContext;
+	//float fTerrainWidth = pTerrain->GetWidth(), fTerrainLength = pTerrain->GetLength();
 
-	float fxPitch = 12.0f * 3.5f;
-	float fyPitch = 12.0f * 3.5f;
-	float fzPitch = 12.0f * 3.5f;
+	//float fxPitch = 12.0f * 3.5f;
+	//float fyPitch = 12.0f * 3.5f;
+	//float fzPitch = 12.0f * 3.5f;
 
-	//직육면체를 지형 표면에 그리고 지형보다 높은 위치에 일정한 간격으로 배치한다.
-	int xObjects = int(fTerrainWidth / fxPitch), yObjects = 2, zObjects = int(fTerrainLength / fzPitch);
-	m_nObjects = xObjects * yObjects * zObjects;
-	m_ppObjects = new GameObject*[m_nObjects];
-
-	CubeMeshDiffused *pCubeMesh = new CubeMeshDiffused(pd3dDevice, pd3dCommandList, 12.0f, 12.0f, 12.0f);
-	
-	XMFLOAT3 xmf3RotateAxis, xmf3SurfaceNormal;
-	RotatingObject *pRotatingObject = NULL;
-	
-	for (int i = 0, x = 0; x < xObjects; x++) { 
-		for (int z = 0; z < zObjects; z++) {
-			for (int y = 0; y < yObjects; y++) {
-				pRotatingObject = new RotatingObject(1);
-				pRotatingObject->SetMesh(0, pCubeMesh);
-				float xPosition = x * fxPitch;
-				float zPosition = z * fzPitch;
-				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
-				pRotatingObject->SetPosition(xPosition, fHeight + (y * 10.0f * fyPitch) + 6.0f, zPosition);
-				if (y == 0) {
-					/*지형의 표면에 위치하는 직육면체는 지형의 기울기에 따라 방향이 다르게 배치한다.
-					직육면체가 위치할 지형의 법선 벡터 방향과 직육면체의 y-축이 일치하도록 한다.*/
-					xmf3SurfaceNormal = pTerrain->GetNormal(xPosition, zPosition);
-
-					// ????????????????????????????
-					XMFLOAT3 xmY = XMFLOAT3(0.0f, 1.0f, 0.0f);
-					xmf3RotateAxis = Vector3::CrossProduct(xmY, xmf3SurfaceNormal);
-					if (Vector3::IsZero(xmf3RotateAxis))
-						xmf3RotateAxis = XMFLOAT3(0.0f, 1.0f, 0.0f);
-
-					float fAngle = acos(Vector3::DotProduct(xmY, xmf3SurfaceNormal));
-					pRotatingObject->Rotate(&xmf3RotateAxis, XMConvertToDegrees(fAngle));
-				}
-				
-				pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-				pRotatingObject->SetRotationSpeed(36.0f * (i % 10) + 36.0f);
-				m_ppObjects[i++] = pRotatingObject;
-			}
-		}
-	}
-
-	//float RectSize = 12.0f;
-
-	//// 가로x세로x높이가 12x12x12인 정육면체 메쉬를 생성
-	//CubeMeshDiffused *pCubeMesh = new CubeMeshDiffused(pd3dDevice, pd3dCommandList, RectSize, RectSize, RectSize);
-
-	//// x-축, y-축, z-축 양의 방향의 객체 개수이다.
-	//int xObjects = 10, yObjects = 10, zObjects = 10, i = 0;
-	//
-	////x-축, y-축, z-축으로 21개씩 총 21 x 21 x 21 = 9261개의 정육면체를 생성하고 배치한다.
-	//m_nObjects = (xObjects * 2 + 1) * (yObjects * 2 + 1) * (zObjects * 2 + 1);
-	//
-	//// 객체 수에 맞는 메모리 할당
+	////직육면체를 지형 표면에 그리고 지형보다 높은 위치에 일정한 간격으로 배치한다.
+	//int xObjects = int(fTerrainWidth / fxPitch), yObjects = 2, zObjects = int(fTerrainLength / fzPitch);
+	//m_nObjects = xObjects * yObjects * zObjects;
 	//m_ppObjects = new GameObject*[m_nObjects];
 
-	//float fxPitch = RectSize * 2.5f;
-	//float fyPitch = RectSize * 2.5f;
-	//float fzPitch = RectSize * 2.5f;
-
+	//CubeMeshDiffused *pCubeMesh = new CubeMeshDiffused(pd3dDevice, pd3dCommandList, 12.0f, 12.0f, 12.0f);
+	//
+	//XMFLOAT3 xmf3RotateAxis, xmf3SurfaceNormal;
 	//RotatingObject *pRotatingObject = NULL;
+	//
+	//for (int i = 0, x = 0; x < xObjects; x++) { 
+	//	for (int z = 0; z < zObjects; z++) {
+	//		for (int y = 0; y < yObjects; y++) {
+	//			pRotatingObject = new RotatingObject(1);
+	//			pRotatingObject->SetMesh(0, pCubeMesh);
+	//			float xPosition = x * fxPitch;
+	//			float zPosition = z * fzPitch;
+	//			float fHeight = pTerrain->GetHeight(xPosition, zPosition);
+	//			pRotatingObject->SetPosition(xPosition, fHeight + (y * 10.0f * fyPitch) + 6.0f, zPosition);
+	//			if (y == 0) {
+	//				/*지형의 표면에 위치하는 직육면체는 지형의 기울기에 따라 방향이 다르게 배치한다.
+	//				직육면체가 위치할 지형의 법선 벡터 방향과 직육면체의 y-축이 일치하도록 한다.*/
+	//				xmf3SurfaceNormal = pTerrain->GetNormal(xPosition, zPosition);
 
-	//for (int x = -xObjects; x <= xObjects; x++) {
-	//	for (int y = -yObjects; y <= yObjects; y++) {
-	//		for (int z = -zObjects; z <= zObjects; z++) {
-	//			// 새로운 OBJ 메모리 할당
-	//			pRotatingObject = new RotatingObject();
-	//			// 주소에 메쉬 생성
-	//			pRotatingObject->SetMesh(pCubeMesh);
+	//				// ????????????????????????????
+	//				XMFLOAT3 xmY = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	//				xmf3RotateAxis = Vector3::CrossProduct(xmY, xmf3SurfaceNormal);
+	//				if (Vector3::IsZero(xmf3RotateAxis))
+	//					xmf3RotateAxis = XMFLOAT3(0.0f, 1.0f, 0.0f);
 
-	//			// 각 정육면체 객체의 위치를 설정
-	//			pRotatingObject->SetPosition(fxPitch*x, fyPitch*y, fzPitch*z);
-	//			// 각 정육면체 객체의 회전축 결정
+	//				float fAngle = acos(Vector3::DotProduct(xmY, xmf3SurfaceNormal));
+	//				pRotatingObject->Rotate(&xmf3RotateAxis, XMConvertToDegrees(fAngle));
+	//			}
+	//			
 	//			pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	//			// 각 정육면체 객체의 회전 속도 결정
-	//			pRotatingObject->SetRotationSpeed(10.0f*(i % 10) + 3.0f);
-	//			// 메모리에 하나씩 저장
+	//			pRotatingObject->SetRotationSpeed(36.0f * (i % 10) + 36.0f);
 	//			m_ppObjects[i++] = pRotatingObject;
 	//		}
 	//	}

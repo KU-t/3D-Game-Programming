@@ -337,7 +337,7 @@ HeightMapImage::HeightMapImage(LPCTSTR pFileName, int nWidth, int nLength, XMFLO
 	m_pHeightMapPixels = new BYTE[m_nWidth * m_nLength];
 	for (int y = 0; y < m_nLength; y++) {
 		for (int x = 0; x < m_nWidth; x++) {
-			m_pHeightMapPixels[x + ((m_nLength - 1 - y)*m_nWidth)] = 100;
+			m_pHeightMapPixels[x + ((m_nLength - 1 - y)*m_nWidth)] = pHeightMapPixels[x + (y*m_nWidth)];;
 			int a = 0;
 		}
 	}
