@@ -59,28 +59,28 @@ void Mesh::ReleaseUploadBuffers() {
 	m_pd3dIndexUploadBuffer = NULL;
 };
 
-void Mesh::Render(ID3D12GraphicsCommandList *pd3dCommandList) {
-	//메쉬의 프리미티브 유형을 설정한다.
-	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
-
-	//메쉬의 정점 버퍼 뷰를 설정한다.
-	// 정점버퍼의 시작 입력 슬롯(디바이스), 정점 버퍼의 개수, 정점버퍼 뷰 주소
-	pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);
-	
-	//인덱스 버퍼가 있으면 인덱스 버퍼를 파이프라인(IA: 입력 조립기)에 연결하고 인덱스를 사용하여 렌더링
-	if (m_pd3dIndexBuffer) {
-		// 파이프라인에 하나의 인덱스 버퍼 연결 가능
-		// 인덱스 버퍼 주소
-		pd3dCommandList->IASetIndexBuffer(&m_d3dIndexBufferView);
-
-		// 인덱스 개수, 객체 수, 시작 인덱스 위치, 각 정점 인덱스에 더해질 값, 객체 인덱스에 더해질 값
-		pd3dCommandList->DrawIndexedInstanced(m_nIndices, 1, 0, 0, 0);
-	} 
-
-	//메쉬의 정점 버퍼 뷰를 렌더링 (파이프라인(입력 조립기)을 작동하게 한다).
-	// 정점 개수, 객체 수, 시작 정점 위치, 객체 인덱스에 더해질 값
-	else	pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
-}
+//void Mesh::Render(ID3D12GraphicsCommandList *pd3dCommandList) {
+//	//메쉬의 프리미티브 유형을 설정한다.
+//	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
+//
+//	//메쉬의 정점 버퍼 뷰를 설정한다.
+//	// 정점버퍼의 시작 입력 슬롯(디바이스), 정점 버퍼의 개수, 정점버퍼 뷰 주소
+//	pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);
+//	
+//	//인덱스 버퍼가 있으면 인덱스 버퍼를 파이프라인(IA: 입력 조립기)에 연결하고 인덱스를 사용하여 렌더링
+//	if (m_pd3dIndexBuffer) {
+//		// 파이프라인에 하나의 인덱스 버퍼 연결 가능
+//		// 인덱스 버퍼 주소
+//		pd3dCommandList->IASetIndexBuffer(&m_d3dIndexBufferView);
+//
+//		// 인덱스 개수, 객체 수, 시작 인덱스 위치, 각 정점 인덱스에 더해질 값, 객체 인덱스에 더해질 값
+//		pd3dCommandList->DrawIndexedInstanced(m_nIndices, 1, 0, 0, 0);
+//	} 
+//
+//	//메쉬의 정점 버퍼 뷰를 렌더링 (파이프라인(입력 조립기)을 작동하게 한다).
+//	// 정점 개수, 객체 수, 시작 정점 위치, 객체 인덱스에 더해질 값
+//	else	pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
+//}
 
 void Mesh::Render(ID3D12GraphicsCommandList * pd3dCommandList, UINT nInstances) {
 	// 입력조립기에 정점버퍼를 Set한다.

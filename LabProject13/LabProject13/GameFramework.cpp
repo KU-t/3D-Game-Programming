@@ -591,6 +591,7 @@ void GameFramework::BuildObjects(){
 	// Player의 Camera를 GameFramework의 Camera로 
 	m_pCamera = m_pPlayer->GetCamera();
 
+
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다.
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };

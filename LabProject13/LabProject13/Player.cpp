@@ -333,7 +333,7 @@ void Player::Render(ID3D12GraphicsCommandList * pd3dCommandList, Camera * pCamer
 	if (m_pShader) {
 		//게임 객체의 월드 변환 행렬을 셰이더의 상수 버퍼로 전달(복사)한다.
 		//m_pShader->UpdateShaderVariable(pd3dCommandList, &m_xmf4x4World);
-		//m_pShader->Render(pd3dCommandList, pCamera);
+		m_pShader->Render(pd3dCommandList, pCamera);
 	}
 
 	// 카메라 모드가 3인칭이면 플레이어 객체를 렌더링한다.
@@ -363,7 +363,7 @@ AirplanePlayer::AirplanePlayer(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 	//pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	// 이거 뭐지(?)  - 쉐이더에 객체가 있는데
-	//SetShader(pShader); 
+	SetShader(pShader); 
 }
 
 AirplanePlayer::~AirplanePlayer(){

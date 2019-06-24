@@ -62,3 +62,15 @@ VS_INSTANCING_OUTPUT VSInstancing(VS_INSTANCING_INPUT input, uint nInstanceID : 
 float4 PSInstancing(VS_INSTANCING_OUTPUT input) : SV_TARGET{
 	return(input.color);
 }
+
+
+void VSMain(float3 iPos : POSITION,	float4 iColor : COLOR,
+	out float4 oPos : SV_POSITION, out float4 oColor : COLOR) {
+	oPos = mul(mul(mul(float4(iPos, 1.f), gmtxWorld), gmtxView), gmtxProjection);
+	oColor = iColor;
+}
+
+void PSMain(float4 inPos : SV_POSITION,	float4 iColor : COLOR,
+	out float4 oColor : SV_TARGET) {
+	oColor = iColor;
+}

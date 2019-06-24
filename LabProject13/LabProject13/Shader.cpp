@@ -248,11 +248,11 @@ D3D12_INPUT_LAYOUT_DESC PlayerShader::CreateInputLayout(){
 }
 
 D3D12_SHADER_BYTECODE PlayerShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob) {
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "VSDiffused", "vs_5_1", ppd3dShaderBlob));
+	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "VSMain", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE PlayerShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob) {
-	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "PSDiffused", "ps_5_1", ppd3dShaderBlob));
+	return(Shader::CompileShaderFromFile(L"Shaders.hlsl", "PSMain", "ps_5_1", ppd3dShaderBlob));
 }
 
 void PlayerShader::CreateShader(ID3D12Device * pd3dDevice, ID3D12RootSignature * pd3dGraphicsRootSignature){
@@ -455,7 +455,7 @@ void InstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCom
 
 void InstancingShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList){
 	// x축, y축, z축의 크기
-	int xObjects = 10, yObjects = 10, zObjects = 10, i = 0;
+	int xObjects = 1, yObjects = 0, zObjects = 1, i = 0;
 	// 전체 객체의 수
 	m_nObjects = (xObjects * 2 + 1) * (yObjects * 2 + 1) * (zObjects * 2 + 1);
 	// 전체 객체의 수 만큼 배열 생성

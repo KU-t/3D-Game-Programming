@@ -13,7 +13,7 @@ GameObject::~GameObject() {
 
 void GameObject::SetShader(Shader *pShader) {
 	if (m_pShader) m_pShader->Release();
-	//m_pShader = pShader;
+	m_pShader = pShader;
 	if (m_pShader) m_pShader->AddRef();
 }
 
@@ -39,6 +39,11 @@ void GameObject::OnPrepareRender() {
 void GameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, Camera *pCamera) {
 	OnPrepareRender();
 	
+	UpdateShaderVariables(pd3dCommandList);
+
+	if (m_pShader)
+		m_pShader->Render(pd3dCommandList, pCamera);
+
 	//게임 객체에 메쉬가 연결되어 있으면 메쉬를 렌더링한다.
 	if (m_pMesh)
 		m_pMesh->Render(pd3dCommandList);
@@ -47,6 +52,11 @@ void GameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, Camera *pCam
 void GameObject::Render(ID3D12GraphicsCommandList * pd3dCommandList, Camera * pCamera, UINT nInstances) {
 
 	OnPrepareRender();
+
+	UpdateShaderVariables(pd3dCommandList);
+
+	if (m_pShader)
+		m_pShader->Render(pd3dCommandList, pCamera);
 
 	//게임 객체에 메쉬가 연결되어 있으면 메쉬를 렌더링한다.
 	if (m_pMesh) m_pMesh->Render(pd3dCommandList, nInstances);
