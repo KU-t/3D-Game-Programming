@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Scene.h"
 
-#define _WITH_TERRAIN_PARTITION
+//#define _WITH_TERRAIN_PARTITION
 
 Scene::Scene() {
 	//[Lab05]
@@ -22,7 +22,7 @@ void Scene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd
 
 	// 지형 그리기
 	//지형을 확대할 스케일 벡터이다. x-축과 z-축은 8배, y-축은 2배 확대한다.
-	XMFLOAT3 xmf3Scale(16.0f, 2.0f, 16.0f);
+	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
 	XMFLOAT4 xmf4Color(0.0f, 0.2f, 0.0f, 0.0f);
 	
 	//지형을 높이 맵 이미지 파일(HeightMap.raw)을 사용하여 생성한다. 높이 맵의 크기는 가로x세로(257x257)이다.
